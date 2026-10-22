@@ -10,6 +10,7 @@ build step: what you commit here is what visitors get.
 _deploy/
 ├── .nojekyll              # required — stops Pages ignoring _-prefixed folders
 ├── index.html             # Home
+├── 404.html               # GitHub Pages "not found" page (links via <base href="/mark/">)
 ├── projects/              # one card per case study
 ├── walkthroughs/          # one card per slide deck
 ├── about/                 # skills, certifications, contact
@@ -18,6 +19,9 @@ _deploy/
 │   ├── hub.css            # layout for the hand-written hub pages
 │   ├── logo.svg           # monogram logo (white, for dark backgrounds)
 │   ├── logo-dark.svg      # the same logo for light backgrounds (deck headings)
+│   ├── favicon.svg, favicon-32.png, apple-touch-icon.png  # tab / phone icons
+│   ├── og-image.png       # link-preview card; tags added by md-to-docs site_meta.py
+│   ├── project-colors.css # GENERATED per-project button colours (project_colors.py)
 │   ├── site-chrome.*      # shared Home · Projects · Walkthroughs · About nav
 │   └── <project>-docs.css # content styles for one case study
 ├── docs/

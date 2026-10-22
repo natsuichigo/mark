@@ -142,7 +142,7 @@ a { color: var(--brand-accent); }
     text-decoration: none;
     color: var(--brand-text);
     text-align: center;
-    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 a.card:hover,
 .card:focus-within {
@@ -194,7 +194,6 @@ a.card:hover,
     background: linear-gradient(135deg, var(--brand-primary-light), var(--brand-accent));
 }
 .btn.alt { background: var(--brand-highlight); color: var(--brand-primary-dark); }
-a.card:hover .btn.alt, .btn.alt:hover { background: #fbbf24; }
 .btn.ghost {
     background: none;
     color: var(--brand-primary);
@@ -300,6 +299,7 @@ a.card:hover .btn.alt, .btn.alt:hover { background: #fbbf24; }
     font-weight: 600;
     background: #ffffff;
 }
+.contact a { transition: filter 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
 .contact a:hover { border-color: var(--brand-accent); color: var(--brand-accent); }
 .contact svg { width: 18px; height: 18px; fill: currentColor; }
 
@@ -329,7 +329,7 @@ a.card:hover .btn.alt, .btn.alt:hover { background: #fbbf24; }
    It sets --proj on the project's cards (Home / Projects) and on its own
    hub page (<body data-project="...">). */
 /* Without --proj these fall back to the normal blue styles. */
-.btn { background: var(--proj, linear-gradient(135deg, var(--brand-primary-light), var(--brand-accent))); transition: filter 0.15s ease; }
+.btn { background: var(--proj, linear-gradient(135deg, var(--brand-primary-light), var(--brand-accent))); transition: filter 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
 .btn.ghost {
     background: none;
     color: var(--proj, var(--brand-primary));
@@ -340,7 +340,12 @@ a.card:hover .btn.alt, .btn.alt:hover { background: #fbbf24; }
     border-color: var(--proj, var(--brand-accent));
     background: rgba(var(--proj-rgb, var(--brand-accent-rgb)), 0.06);
 }
-a.card:hover .btn:not(.ghost), .btn:not(.ghost):hover { filter: brightness(1.12); }
+a.card:hover .btn:not(.ghost), .btn:not(.ghost):hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(var(--proj-rgb, var(--brand-accent-rgb)), 0.28);
+}
+a.card:hover .btn.alt, .btn.alt:hover { box-shadow: 0 6px 14px rgba(var(--brand-highlight-rgb), 0.4); }
 
 .icon-badge      { background: var(--proj, linear-gradient(135deg, var(--brand-primary-light), var(--brand-accent))); }
 .icon-badge.deep { background: var(--proj, linear-gradient(135deg, var(--brand-primary-dark), var(--brand-accent) 60%, var(--brand-accent-2))); }

@@ -171,6 +171,8 @@ mark/
     │   ├── theme.css              # THE BRAND: --brand-* colours for every page
     │   ├── hub.css                # layout for the hand-written hub pages
     │   ├── project-colors.css     # GENERATED: per-project button colours (project_colors.py)
+    │   ├── favicon.svg / favicon-32.png / apple-touch-icon.png  # browser-tab and phone icons
+    │   ├── og-image.png           # 1200x630 link-preview card (LinkedIn, Slack, Teams, X)
     │   ├── logo.svg / logo-dark.svg
     │   ├── site-chrome.css / .js  # the Home · Projects · Walkthroughs · About nav
     │   └── <project>-docs.css     # per-project content component CSS
@@ -264,6 +266,22 @@ in the project's `_src/docs.config.json`:
   slides) stay amber. A project without a brand uses the default blue.
 - `validate_pages.py` checks the chain: a known brand, an up-to-date
   `project-colors.css`, `hub.css` importing it, and `data-project` on the hub.
+
+## Favicon and link previews
+
+Every page carries a managed block before `</head>` (between
+`<!-- site-meta: … -->` and `<!-- /site-meta -->`): the favicon, the
+apple-touch-icon, and Open Graph / Twitter tags so a shared link shows a
+title card with `assets/og-image.png`. `site_meta.py` writes it from each
+page's own `<title>` and description (or subtitle).
+
+- `build_project.py` runs it after every build, and `scaffold_deck.py` for new
+  decks. After **hand-editing** a hub page (Home, Projects, About, a project
+  `index.html`), changing its `<title>` or description, or adding a new page,
+  run `python3 ${CLAUDE_SKILL_DIR}/scripts/site_meta.py`.
+- Never edit inside the block; it is replaced on every run.
+- `validate_pages.py` fails a page whose block is missing or stale;
+  `site_meta.py --check` covers the pages outside `docs/` too.
 
 ## Workflow
 
@@ -455,7 +473,8 @@ Auto-installs `pymupdf`/`pymupdf4llm` on first run.
 
 `scripts/build_project.py`: regenerates EVERY page in a set from `_src/`.
 - Converts `_src/<slug>.md` → `<slug>.html` for each `nav[]` entry.
-- Then regenerates `project-colors.css` from every config's `"brand"`.
+- Then regenerates `project-colors.css` from every config's `"brand"`, and
+  re-applies the favicon / link-preview block (`site_meta.py`).
 - **Refuses to build a partial set**: a nav entry with no source is reported and
   nothing is written. Orphan sources not in `nav[]` are reported too.
 - Flags: `--repo-root`, `--deploy-dir`, `--project`, `--src-dir` (default
@@ -467,7 +486,10 @@ these pages.
   prev/next chain, internal links and relative assets resolving, unrendered
   Markdown tables and code spans, placeholder tags the browser eats, tag
   balance, `_src/` source coverage, and the project button colour (brand
-  known, `project-colors.css` current, `data-project` on the hub).
+  known, `project-colors.css` current, `data-project` on the hub), the
+  favicon / link-preview block on every page, and every live relative link on
+  the hub page (e.g. a "Walkthrough slides" button uncommented before its deck
+  exists).
 - **Two severities.** With `_src/docs.config.json` present, structural findings
   are FAILURES; without one, WARNINGS. Broken links, unresolvable assets,
   unrendered Markdown and unbalanced tags always fail.
@@ -490,6 +512,12 @@ from each config's `"brand"` key (see "Project button colour").
 - Run automatically by `build_project.py` and `scaffold_project.py --brand`.
 - Flags: `--repo-root`, `--deploy-dir`, `--check` (exit 1 if out of date),
   `--list-tools`.
+
+`scripts/site_meta.py`: adds / refreshes the favicon and link-preview block on
+every page of the site (see "Favicon and link previews"). Skips redirect stubs.
+- Run automatically by `build_project.py` and `scaffold_deck.py`.
+- Flags: `--repo-root`, `--deploy-dir`, `--check` (exit 1 if any page is
+  missing or stale).
 
 `scripts/extract_config.py`: rebuilds a `docs.config.json` from a deployed
 page (title, CSS file, typeset prefix, index label, footer, depth and the nav

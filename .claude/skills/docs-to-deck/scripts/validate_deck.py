@@ -321,6 +321,16 @@ def validate_landing_page(name: str, html: str, deck_dir: Path, rep: Report):
               f"missing: {', '.join(sorted(missing))}")
 
 
+def _site_meta():
+    """md-to-docs' site_meta module (favicon + link-preview tags), or None."""
+    scripts = Path(__file__).resolve().parents[2] / "md-to-docs" / "scripts"
+    if not (scripts / "site_meta.py").is_file():
+        return None
+    sys.path.insert(0, str(scripts))
+    import site_meta
+    return site_meta
+
+
 def validate_deck(deck_dir: Path, hub_html: str, rep: Report, shared_css: str = ""):
     name = deck_dir.name
     page = deck_dir / "index.html"
@@ -331,6 +341,12 @@ def validate_deck(deck_dir: Path, hub_html: str, rep: Report, shared_css: str = 
         return
 
     rep.section(f"{name}")
+
+    meta = _site_meta()
+    if meta:
+        rel = page.relative_to(deck_dir.parent.parent).as_posix()
+        rep.check(meta.apply(rel, html) == html, f"{name}: favicon and link-preview tags current",
+                  "run md-to-docs/scripts/site_meta.py")
 
     # ── slide count vs the nav label ──────────────────────────────────────
     slides = top_level_sections(html)

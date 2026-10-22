@@ -42,7 +42,8 @@ mark/.claude/skills/docs-to-deck/
 ├── scripts/
 │   ├── deck_facts.py        what the case study actually has, plus an agenda skeleton
 │   ├── blocks.py            renders declared content into the house components
-│   ├── scaffold_deck.py     writes the deck: shell, agenda wiring, slides via blocks.py
+│   ├── scaffold_deck.py     writes the deck: shell, agenda wiring, slides via blocks.py,
+│   │                        plus the favicon / link-preview tags (md-to-docs site_meta.py)
 │   ├── validate_deck.py     structure AND layout, from the source
 │   ├── ensure_render_env.py venv + playwright + browser; on Linux, rootless system libs
 │   └── screenshot_deck.py   renders every slide and measures overflow per viewport

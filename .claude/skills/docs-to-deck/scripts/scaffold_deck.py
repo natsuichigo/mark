@@ -225,6 +225,16 @@ def build(plan: dict, like: Path) -> str:
 """
 
 
+def _site_meta():
+    """md-to-docs' site_meta module (favicon + link-preview tags), or None."""
+    scripts = Path(__file__).resolve().parents[2] / "md-to-docs" / "scripts"
+    if not (scripts / "site_meta.py").is_file():
+        return None
+    sys.path.insert(0, str(scripts))
+    import site_meta
+    return site_meta
+
+
 def main():
     ap = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -254,7 +264,11 @@ def main():
                  f"(this discards any slides written there)")
 
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(build(plan, like), encoding="utf-8")
+    deck_html = build(plan, like)
+    meta = _site_meta()
+    if meta:  # favicon + link-preview tags, same as every other page
+        deck_html = meta.apply(out.relative_to(pdir.parent).as_posix(), deck_html)
+    out.write_text(deck_html, encoding="utf-8")
 
     slides = 2 + sum(len(p.get("slides", [])) for p in plan["phases"])
     print(f"\n  wrote {out.relative_to(repo_root)}")

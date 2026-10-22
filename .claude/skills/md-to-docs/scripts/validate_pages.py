@@ -293,6 +293,25 @@ def validate_project(project_dir: Path, deploy_root: Path, rep: Report) -> None:
         detail = "; ".join(parser.errors[:2]) or f"unclosed at EOF: {parser.stack[:5]}"
         rep.check(not parser.errors and not parser.stack, f"{name}: tags balanced", detail)
 
+    # ── Favicon and link previews ────────────────────────────────────────────
+    rep.section("Favicon and link previews")
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import site_meta
+    stale = [n for n, s in sorted(pages.items())
+             if site_meta.apply(f"docs/{project}/{n}", s) != s]
+    rep.check(not stale, f"all {len(pages)} pages have current favicon / link-preview tags",
+              f"{stale} — run site_meta.py (build_project.py does this)")
+
+    # ── Hub page links ───────────────────────────────────────────────────────
+    # Hub pages are hand-edited, so check every live (uncommented) relative link
+    # on them, including ones leaving the set (decks, Projects, Home).
+    rep.section("Hub page links")
+    for name in hubs:
+        live = re.sub(r"<!--.*?-->", "", pages[name], flags=re.S)
+        hrefs = sorted(set(re.findall(r'href="((?:\.\./|\./)[^"#?]+)"', live)))
+        broken = [h for h in hrefs if not (project_dir / unquote(h)).resolve().exists()]
+        rep.check(not broken, f"{name}: {len(hrefs)} relative links resolve", str(broken))
+
     # ── Project colour ───────────────────────────────────────────────────────
     # The button colour comes from the config's "brand" key via the generated
     # assets/project-colors.css, and reaches the hub page through
