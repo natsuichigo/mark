@@ -1,0 +1,14 @@
+{
+  "site_name": "Platform Lab",
+  "docidx_label": "Platform Lab",
+  "css_file": "platform-lab-docs.css",
+  "footer_name": "Platform Lab — Mark",
+  "typeset_prefix": "pl",
+  "depth": 2,
+  "nav": [
+    {"slug": "overview.html", "title": "Overview", "section": "The Project"},
+    {"slug": "architecture.html", "title": "Architecture", "section": "The Project"},
+    {"slug": "how-it-works.html", "title": "How It Works", "section": "Deep Dive"},
+    {"slug": "lessons.html", "title": "Lessons & Next Steps", "section": "Deep Dive"}
+  ]
+}

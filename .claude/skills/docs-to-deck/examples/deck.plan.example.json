@@ -1,0 +1,165 @@
+{
+  "_comment": [
+    "Deck plan for scaffold_deck.py.",
+    "",
+    "deck_type is REQUIRED and is not cosmetic: it decides the deck's length,",
+    "depth and tone. Establish it with the user BEFORE writing any slides",
+    "(SKILL.md STEP 0):",
+    "",
+    "  overview   recruiters / hiring managers -> short, outcome-first,",
+    "             five or six content slides, little code.",
+    "  deep-dive  engineers / technical interview -> architecture,",
+    "             decisions and trade-offs, code where it explains something.",
+    "  talk       meetup or team talk -> story-led: the problem, false",
+    "             starts, the fix, the lessons.",
+    "",
+    "Record the audience too, so the next update does not have to re-ask.",
+    "`deck_facts.py --deck-type <type>` prints the agenda skeleton these",
+    "phases should follow.",
+    "",
+    "The phases[] order IS the slide order. Slide 0 is the title, slide 1 the",
+    "agenda, so the first content slide is index 2. The scaffolder computes",
+    "every agenda card's data-slide-target from that, which is the part that",
+    "silently breaks when slides are added by hand.",
+    "",
+    "Give a slide a blocks[] list and blocks.py renders its content into the",
+    "house components; a slide without one comes in as a titled placeholder.",
+    "Prefer blocks: the renderer refuses the markup that breaks a deck.",
+    "Keep the real plan next to the deck, in presentations/<slug>/_src/,",
+    "so the deck can be regenerated after an edit.",
+    "",
+    "Every fact on a slide comes from the case-study pages, never from memory."
+  ],
+  "slug": "packer-image-pipeline",
+  "title": "Packer Golden Image Pipeline",
+  "subtitle": "Hardened images for AWS and vSphere, validated inside the build",
+  "deck_type": "overview",
+  "audience": "Recruiters and hiring managers",
+  "pills": [
+    "Packer",
+    "Ansible",
+    "GitHub Actions",
+    "AWS + vSphere"
+  ],
+  "docs_href": "../../docs/packer-image-pipeline/index.html",
+  "docs_label": "Read the Case Study",
+  "agenda_intro": "What the pipeline does, how it works, and what it gives you. Select any slide to jump to it.",
+  "phases": [
+    {
+      "title": "The Project",
+      "slides": [
+        {
+          "_comment": "A fully rendered slide. Note the box nested in a panel: it comes out as <p><strong>…</strong></p>, because a .box inside a .split-panel escapes it and overlaps the next block.",
+          "title": "The Problem, in One Slide",
+          "icon": "fa-circle-question",
+          "blocks": [
+            {
+              "box": "navy",
+              "icon": "fa-bullseye",
+              "lead": "The one-sentence version:",
+              "text": "every server should start from a <strong>known, hardened, tested image</strong>, not be configured by hand after it boots."
+            },
+            {
+              "panels": [
+                {
+                  "tone": "blue",
+                  "title": "Without it",
+                  "icon": "fa-xmark",
+                  "blocks": [
+                    {
+                      "list": [
+                        "Each server drifts a little",
+                        "Hardening depends on who built it"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "tone": "green",
+                  "title": "With it",
+                  "icon": "fa-check",
+                  "blocks": [
+                    {
+                      "list": [
+                        "Every server starts identical",
+                        "CIS hardening is part of the build"
+                      ]
+                    },
+                    {
+                      "box": "yellow",
+                      "lead": "Validation is inline.",
+                      "text": "A failed check fails the build, so a bad image is never published."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "table": {
+                "compact": true,
+                "headers": [
+                  "OS",
+                  "AWS",
+                  "vSphere"
+                ],
+                "rows": [
+                  [
+                    "RHEL 8.10",
+                    {
+                      "text": "Yes",
+                      "tone": "green"
+                    },
+                    {
+                      "text": "Yes",
+                      "tone": "green"
+                    }
+                  ],
+                  [
+                    "Amazon Linux 2023",
+                    {
+                      "text": "Yes",
+                      "tone": "green"
+                    },
+                    "—"
+                  ],
+                  [
+                    "Windows Server 2022",
+                    {
+                      "text": "Yes",
+                      "tone": "green"
+                    },
+                    {
+                      "text": "Yes",
+                      "tone": "green"
+                    }
+                  ]
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "title": "What I Built",
+          "icon": "fa-hammer"
+        }
+      ]
+    },
+    {
+      "title": "How It Works",
+      "slides": [
+        {
+          "title": "One Build, End to End",
+          "icon": "fa-gears"
+        },
+        {
+          "title": "Results: What It Gives You",
+          "icon": "fa-chart-line"
+        },
+        {
+          "title": "Stack and Links",
+          "icon": "fa-link"
+        }
+      ]
+    }
+  ]
+}

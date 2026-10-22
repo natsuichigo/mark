@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mark — DevOps &amp; Platform Engineer</title>
+    <meta name="description" content="Portfolio of Mark, DevOps and Platform Engineer: golden image pipelines, Ansible Execution Environments and a Kubernetes home lab.">
+    <link rel="stylesheet" href="./assets/hub.css">
+    <link rel="stylesheet" href="./assets/site-chrome.css">
+
+    <!-- site chrome config -->
+    <meta name="sc-portal" content="./index.html">
+    <meta name="sc-type"   content="hub">
+    <meta name="sc-active" content="home">
+    <script src="./assets/site-chrome.js" defer></script>
+</head>
+<body>
+    <main class="panel">
+        <section class="hero" aria-label="Introduction">
+            <img class="brand-logo" src="./assets/logo.svg" alt="Mark">
+            <h1>Mark</h1>
+            <p class="role">DevOps &amp; Platform Engineer</p>
+            <p class="subtitle">Automation, golden images and the platforms that run on them.</p>
+        </section>
+
+        <section class="intro" aria-labelledby="about-me">
+            <h2 id="about-me">About me</h2>
+            <p>I build the pipelines and platforms that make infrastructure repeatable: hardened
+               golden images with Packer and Ansible, tested Ansible Execution Environments, and a
+               Kubernetes home lab run like production.</p>
+            <p>This site collects those projects: what each one does, how it works and what I
+               learned building it.</p>
+        </section>
+
+        <section class="links" aria-label="Site sections">
+            <a class="card" href="./projects/index.html">
+                <div class="icon-badge" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-2 .89-2 2v11c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zM10 4h4v2h-4V4zm10 15H4V8h16v11z"/></svg>
+                </div>
+                <h2>Projects</h2>
+                <p>Case studies: what I built, how it works and why.</p>
+                <span class="btn">→ View projects</span>
+            </a>
+
+            <a class="card" href="./walkthroughs/index.html">
+                <div class="icon-badge alt" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false"><path d="M3 4h18v12H3zm6 14h6v2H9z"/></svg>
+                </div>
+                <h2>Walkthroughs</h2>
+                <p>Slide-deck tours of my projects.</p>
+                <span class="btn alt">→ Open slides</span>
+            </a>
+
+            <a class="card" href="./about/index.html">
+                <div class="icon-badge deep" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                </div>
+                <h2>About &amp; CV</h2>
+                <p>Skills, certifications and how to reach me.</p>
+                <span class="btn">→ About me</span>
+            </a>
+        </section>
+
+        <div class="section-label"><span>Featured projects</span></div>
+
+        <section class="links" aria-label="Featured projects">
+            <a class="card" href="./docs/packer-image-pipeline/index.html">
+                <h3>Packer Golden Image Pipeline</h3>
+                <p>CIS-hardened RHEL, Amazon Linux and Windows images for AWS and vSphere, validated inside the build.</p>
+                <ul class="chips"><li>Packer</li><li>Ansible</li><li>GitHub Actions</li><li>AWS</li><li>vSphere</li></ul>
+                <span class="btn ghost">Read the case study</span>
+            </a>
+
+            <a class="card" href="./docs/ansible-ee-pipeline/index.html">
+                <h3>Ansible EE Pipeline</h3>
+                <p>Builds, tests and promotes Ansible Execution Environments for AAP and AWX.</p>
+                <ul class="chips"><li>ansible-builder</li><li>Containers</li><li>GitHub Actions</li><li>AAP</li></ul>
+                <span class="btn ghost">Read the case study</span>
+            </a>
+
+            <a class="card" href="./docs/platform-lab/index.html">
+                <h3>Platform Lab</h3>
+                <p>A home platform run like production, built sprint by sprint on Kubernetes.</p>
+                <ul class="chips"><li>Kubernetes</li><li>Helm</li><li>Traefik</li><li>Podman</li></ul>
+                <span class="btn ghost">Read the case study</span>
+            </a>
+        </section>
+
+        <nav class="contact" aria-label="Contact">
+            <a href="https://github.com/natsuichigo">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.1.68-.22.68-.49v-1.7c-2.78.62-3.37-1.38-3.37-1.38-.46-1.18-1.11-1.5-1.11-1.5-.91-.64.07-.62.07-.62 1 .07 1.53 1.05 1.53 1.05.89 1.57 2.34 1.12 2.91.85.09-.66.35-1.12.63-1.38-2.22-.26-4.56-1.14-4.56-5.07 0-1.12.39-2.04 1.03-2.75-.1-.26-.45-1.3.1-2.71 0 0 .84-.28 2.75 1.05a9.4 9.4 0 0 1 5 0c1.91-1.33 2.75-1.05 2.75-1.05.55 1.41.2 2.45.1 2.71.64.71 1.03 1.63 1.03 2.75 0 3.94-2.34 4.81-4.57 5.06.36.32.68.94.68 1.9v2.82c0 .27.18.6.69.49A10.13 10.13 0 0 0 22 12.25C22 6.58 17.52 2 12 2z"/></svg>
+                GitHub
+            </a>
+            <!-- TODO: add your LinkedIn URL, then uncomment.
+            <a href="https://www.linkedin.com/in/YOUR-PROFILE/">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zM8.34 18H5.67V9.75h2.67V18zM7 8.6a1.55 1.55 0 1 1 0-3.1 1.55 1.55 0 0 1 0 3.1zM18.34 18h-2.67v-4.01c0-.96-.02-2.19-1.33-2.19-1.34 0-1.54 1.04-1.54 2.12V18h-2.67V9.75h2.56v1.13h.04c.36-.67 1.23-1.38 2.53-1.38 2.7 0 3.2 1.78 3.2 4.1V18z"/></svg>
+                LinkedIn
+            </a>
+            -->
+            <!-- TODO: add the email address you want public, then uncomment.
+            <a href="mailto:YOU@example.com">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                Email
+            </a>
+            -->
+        </nav>
+
+        <p class="meta">Mark — DevOps &amp; Platform Engineer</p>
+    </main>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Lessons &amp; Next Steps — Platform Lab</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+    <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+    <link rel="prev" href="how-it-works.html">
+    <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+    <link rel="stylesheet" href="../theme.local.css">
+    <link rel="stylesheet" href="../../assets/platform-lab-docs.css">
+</head>
+<body dir="ltr">
+
+<input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+<label class="md-overlay" for="__drawer"></label>
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="./index.html" title="Platform Lab" class="md-header__button md-logo" aria-label="Platform Lab"></a>
+    <label class="md-header__button md-icon" for="__drawer" aria-label="Open navigation">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic"><span class="md-ellipsis">Platform Lab</span></div>
+        <div class="md-header__topic" data-md-component="header-topic"><span class="md-ellipsis">Lessons &amp; Next Steps</span></div>
+      </div>
+    </div>
+  </nav>
+  <div class="hdr-page-nav" id="hdr-page-nav" aria-label="Page navigation"></div>
+  <script>(function(){function slugToTitle(h){var n=h.split("/").pop().replace(/\.html$/,"").replace(/-/g," ");return n.charAt(0).toUpperCase()+n.slice(1);}function buildNav(){var row=document.getElementById("hdr-page-nav");if(!row)return;var pE=document.querySelector("link[rel=prev]"),nE=document.querySelector("link[rel=next]"),pO=document.getElementById("pnav-prev"),nO=document.getElementById("pnav-next");var pH=pO?pO.dataset.href:(pE?pE.getAttribute("href"):null),pL=pO?pO.dataset.label:(pE?"&#9664; "+slugToTitle(pE.getAttribute("href")):null),nH=nO?nO.dataset.href:(nE?nE.getAttribute("href"):null),nL=nO?nO.dataset.label:(nE?slugToTitle(nE.getAttribute("href"))+" &#9654;":null);row.innerHTML=(pH?'<a class="hdr-page-nav__link hdr-page-nav__prev" href="'+pH+'">'+pL+'</a>':'<span class="hdr-page-nav__spacer"></span>')+'<div class="hdr-page-nav__centre"><a class="hdr-page-nav__link hdr-page-nav__hub" href="../../projects/index.html">Projects</a><a class="hdr-page-nav__link hdr-page-nav__docidx" href="./index.html">Platform Lab</a><a class="hdr-page-nav__link hdr-page-nav__portal" href="../../index.html">Home</a></div>'+(nH?'<a class="hdr-page-nav__link hdr-page-nav__next" href="'+nH+'">'+nL+'</a>':'<span class="hdr-page-nav__spacer"></span>');}if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",buildNav);}else{buildNav();}})()</script>
+</header>
+
+<div class="md-container">
+  <main class="md-main">
+    <div class="md-main__inner md-grid">
+
+      <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+        <div class="md-sidebar__scrollwrap"><div class="md-sidebar__inner">
+          <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+            <label class="md-nav__title" for="__drawer">
+              <a href="./index.html" class="md-nav__button md-logo" aria-label="Platform Lab"></a>
+              Platform Lab
+            </label>
+            <ul class="md-nav__list">
+              <li class="md-nav__item md-nav__section-label">The Project</li>
+              <li class="md-nav__item"><a href="./overview.html" class="md-nav__link">Overview</a></li>
+              <li class="md-nav__item"><a href="./architecture.html" class="md-nav__link">Architecture</a></li>
+              <li class="md-nav__item md-nav__section-label">Deep Dive</li>
+              <li class="md-nav__item"><a href="./how-it-works.html" class="md-nav__link">How It Works</a></li>
+              <li class="md-nav__item"><a href="./lessons.html" class="md-nav__link md-nav__link--active">Lessons &amp; Next Steps</a></li>
+            </ul>
+          </nav>
+        </div></div>
+      </div>
+
+      <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc">
+        <div class="md-sidebar__scrollwrap"><div class="md-sidebar__inner">
+          <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+            <label class="md-nav__title">On this page</label>
+            <ul class="md-nav__list" id="pd-toc"></ul>
+          </nav>
+        </div></div>
+      </div>
+
+      <div class="md-content" data-md-component="content">
+        <article class="md-content__inner md-typeset pl-typeset">
+
+        <h1 class="page-title">Lessons &amp; Next Steps</h1>
+        <p class="page-sub">Decisions made so far, and the roadmap.</p>
+<h2 id="decisions-so-far">Decisions So Far</h2>
+<ul>
+<li><strong>Traefik instead of ingress-nginx.</strong> The architecture first named ingress-nginx,
+  but that project was retired in March 2026 and no longer receives security fixes.
+  Sprint 1 uses Traefik instead, with the Ingress API for now; Gateway API is the
+  recommended direction for new designs and will be evaluated in a later sprint.</li>
+<li><strong>Podman as the kind provider.</strong> It keeps the lab free of a Windows-side container
+  runtime. The trade-off is rootless networking, which can need extra host
+  capabilities when the cluster or ingress misbehaves.</li>
+<li><strong>Local-only by default.</strong> <code>.localhost</code> names and a loopback-bound port-forward keep
+  everything on the machine. Nothing is exposed until there is a reason to.</li>
+<li><strong>Capacity before features.</strong> Backstage, AWX, Jenkins, n8n and the full
+  Prometheus/Grafana/Loki stack wait until the lab has the resources. A single node
+  that runs well beats a crowded one that doesn't.</li>
+</ul>
+<h2 id="roadmap">Roadmap</h2>
+<table>
+<thead>
+<tr>
+<th>Sprint</th>
+<th>Goal</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sprint 0</td>
+<td>Workstation tooling, repository structure, GitHub metadata</td>
+<td>Done</td>
+</tr>
+<tr>
+<td>Sprint 1</td>
+<td>kind cluster, Helm, ingress, Metrics Server, a sample app, CKAD labs</td>
+<td>In progress</td>
+</tr>
+<tr>
+<td>Sprint 2</td>
+<td>Argo CD with its UI on a local Traefik route; manage an app from Git</td>
+<td>Next</td>
+</tr>
+<tr>
+<td>Later</td>
+<td>cert-manager, lightweight observability, Headlamp; then Backstage, AWX, Jenkins, n8n as capacity allows; Terraform and a Packer image factory</td>
+<td>Planned</td>
+</tr>
+</tbody>
+</table>
+<h2 id="goals-behind-it">Goals Behind It</h2>
+<p>The lab supports working towards the <strong>CKAD</strong>, <strong>CKA</strong> and an <strong>AWS Associate</strong>
+certification, and it gives the other projects on this site a place to run: the
+<a href="../packer-image-pipeline/index.html">Packer pipeline</a> and the
+<a href="../ansible-ee-pipeline/index.html">Ansible EE pipeline</a> both have homes in its
+<code>images/</code> folder.</p>
+
+        </article>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="md-footer">
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">Platform Lab — Mark</div>
+    </div>
+  </div>
+</footer>
+
+</div>
+
+<script>
+(function(){
+  function buildToc(){
+    var toc=document.getElementById("pd-toc");
+    if(!toc)return;
+    var headings=document.querySelectorAll(".md-typeset h2");
+    if(!headings.length){
+      var sec=toc.closest(".md-sidebar--secondary");
+      if(sec)sec.style.display="none";
+      return;
+    }
+    var html="";
+    for(var i=0;i<headings.length;i++){
+      var h=headings[i];
+      if(!h.id)h.id="section-"+i;
+      html+='<li class="md-nav__item"><a class="md-nav__link" href="#'+h.id+'">'+h.textContent+'</a></li>';
+    }
+    toc.innerHTML=html;
+  }
+  function initScrollSpy(){
+    var links=document.querySelectorAll("#pd-toc .md-nav__link");
+    if(!links.length)return;
+    function onScroll(){
+      var hs=document.querySelectorAll(".md-typeset h2"),active=null;
+      var st=window.pageYOffset||document.documentElement.scrollTop||0;
+      for(var i=hs.length-1;i>=0;i--){if(hs[i].getBoundingClientRect().top+st-140<=st){active=hs[i].id;break;}}
+      for(var j=0;j<links.length;j++){links[j].className=active&&links[j].getAttribute("href")==="#"+active?"md-nav__link md-nav__link--active":"md-nav__link";}
+    }
+    window.addEventListener("scroll",onScroll,{passive:true});
+  }
+  if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",function(){buildToc();initScrollSpy();});}
+  else{buildToc();initScrollSpy();}
+})();
+</script>
+
+<button class="back-to-top" id="back-to-top" aria-label="Back to top" title="Back to top">&#8679;</button>
+<script>(function(){var b=document.getElementById("back-to-top");window.addEventListener("scroll",function(){b.classList.toggle("visible",window.scrollY>400);},{passive:true});b.addEventListener("click",function(){window.scrollTo({top:0,behavior:"smooth"});});})();</script>
+    <data id="pnav-prev" data-href="./how-it-works.html" data-label="&#9664; How It Works" hidden></data>
+</body>
+</html>

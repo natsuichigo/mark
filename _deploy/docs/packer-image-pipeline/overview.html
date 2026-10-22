@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Overview — Packer Golden Image Pipeline</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+    <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+    <link rel="next" href="architecture.html">
+    <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+    <link rel="stylesheet" href="../theme.local.css">
+    <link rel="stylesheet" href="../../assets/packer-image-pipeline-docs.css">
+</head>
+<body dir="ltr">
+
+<input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+<label class="md-overlay" for="__drawer"></label>
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="./index.html" title="Packer Golden Image Pipeline" class="md-header__button md-logo" aria-label="Packer Golden Image Pipeline"></a>
+    <label class="md-header__button md-icon" for="__drawer" aria-label="Open navigation">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic"><span class="md-ellipsis">Packer Golden Image Pipeline</span></div>
+        <div class="md-header__topic" data-md-component="header-topic"><span class="md-ellipsis">Overview</span></div>
+      </div>
+    </div>
+  </nav>
+  <div class="hdr-page-nav" id="hdr-page-nav" aria-label="Page navigation"></div>
+  <script>(function(){function slugToTitle(h){var n=h.split("/").pop().replace(/\.html$/,"").replace(/-/g," ");return n.charAt(0).toUpperCase()+n.slice(1);}function buildNav(){var row=document.getElementById("hdr-page-nav");if(!row)return;var pE=document.querySelector("link[rel=prev]"),nE=document.querySelector("link[rel=next]"),pO=document.getElementById("pnav-prev"),nO=document.getElementById("pnav-next");var pH=pO?pO.dataset.href:(pE?pE.getAttribute("href"):null),pL=pO?pO.dataset.label:(pE?"&#9664; "+slugToTitle(pE.getAttribute("href")):null),nH=nO?nO.dataset.href:(nE?nE.getAttribute("href"):null),nL=nO?nO.dataset.label:(nE?slugToTitle(nE.getAttribute("href"))+" &#9654;":null);row.innerHTML=(pH?'<a class="hdr-page-nav__link hdr-page-nav__prev" href="'+pH+'">'+pL+'</a>':'<span class="hdr-page-nav__spacer"></span>')+'<div class="hdr-page-nav__centre"><a class="hdr-page-nav__link hdr-page-nav__hub" href="../../projects/index.html">Projects</a><a class="hdr-page-nav__link hdr-page-nav__docidx" href="./index.html">Packer Pipeline</a><a class="hdr-page-nav__link hdr-page-nav__portal" href="../../index.html">Home</a></div>'+(nH?'<a class="hdr-page-nav__link hdr-page-nav__next" href="'+nH+'">'+nL+'</a>':'<span class="hdr-page-nav__spacer"></span>');}if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",buildNav);}else{buildNav();}})()</script>
+</header>
+
+<div class="md-container">
+  <main class="md-main">
+    <div class="md-main__inner md-grid">
+
+      <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+        <div class="md-sidebar__scrollwrap"><div class="md-sidebar__inner">
+          <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+            <label class="md-nav__title" for="__drawer">
+              <a href="./index.html" class="md-nav__button md-logo" aria-label="Packer Golden Image Pipeline"></a>
+              Packer Golden Image Pipeline
+            </label>
+            <ul class="md-nav__list">
+              <li class="md-nav__item md-nav__section-label">The Project</li>
+              <li class="md-nav__item"><a href="./overview.html" class="md-nav__link md-nav__link--active">Overview</a></li>
+              <li class="md-nav__item"><a href="./architecture.html" class="md-nav__link">Architecture</a></li>
+              <li class="md-nav__item md-nav__section-label">Deep Dive</li>
+              <li class="md-nav__item"><a href="./how-it-works.html" class="md-nav__link">How It Works</a></li>
+              <li class="md-nav__item"><a href="./lessons.html" class="md-nav__link">Lessons &amp; Next Steps</a></li>
+            </ul>
+          </nav>
+        </div></div>
+      </div>
+
+      <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc">
+        <div class="md-sidebar__scrollwrap"><div class="md-sidebar__inner">
+          <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+            <label class="md-nav__title">On this page</label>
+            <ul class="md-nav__list" id="pd-toc"></ul>
+          </nav>
+        </div></div>
+      </div>
+
+      <div class="md-content" data-md-component="content">
+        <article class="md-content__inner md-typeset pip-typeset">
+
+        <h1 class="page-title">Overview</h1>
+        <p class="page-sub">Hardened golden images for AWS and vSphere, built by Packer and Ansible and validated inside the build.</p>
+<p>Every server should start from a known, hardened, tested image rather than being
+configured by hand after it boots. This project builds those <strong>golden images</strong>
+with HashiCorp Packer, configures and hardens them with Ansible, and runs the whole
+thing from GitHub Actions, for two platforms: <strong>AWS</strong> (AMIs) and <strong>VMware vSphere</strong>
+(content-library templates).</p>
+<div class="callout">
+<p><strong>The rule the whole pipeline is built around.</strong> Validation runs <em>inside</em> the build, as the last provisioner before clean-up. A failed check fails the build, so no AMI or template is ever published from a bad run.</p>
+</div>
+
+<h2 id="what-it-builds">What It Builds</h2>
+<table>
+<thead>
+<tr>
+<th>OS</th>
+<th>AWS</th>
+<th>vSphere</th>
+<th>Hardening</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RHEL 8.10</td>
+<td>Two-stage (<code>amazon-ebssurrogate</code> → <code>amazon-ebs</code>)</td>
+<td>Kickstart ISO build</td>
+<td>CIS (<code>rhel_cis</code> role)</td>
+</tr>
+<tr>
+<td>Amazon Linux 2023 (x86_64 + arm64)</td>
+<td>Two-stage</td>
+<td>—</td>
+<td>CIS (<code>aml23_cis</code> role)</td>
+</tr>
+<tr>
+<td>Windows Server 2022</td>
+<td>Single stage</td>
+<td>Autounattend ISO build</td>
+<td>Baseline; CIS arrives by GPO after domain join</td>
+</tr>
+</tbody>
+</table>
+<h2 id="the-stack">The Stack</h2>
+<div class="badge-row">
+    <span class="badge badge-blue">Packer</span>
+    <span class="badge badge-green">Ansible</span>
+    <span class="badge badge-amber">GitHub Actions</span>
+    <span class="badge badge-blue">AWS</span>
+    <span class="badge badge-green">VMware vSphere</span>
+</div>
+
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Tools</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Image builds</td>
+<td>Packer: <code>amazon-ebssurrogate</code>, <code>amazon-ebs</code>, <code>vsphere-iso</code></td>
+</tr>
+<tr>
+<td>Configuration and hardening</td>
+<td>Ansible roles: <code>base</code>, <code>configure</code>, <code>clean</code>, <code>rhel_cis</code>, <code>aml23_cis</code>, <code>software_collections</code></td>
+</tr>
+<tr>
+<td>Validation</td>
+<td>Bash validators for Linux, PowerShell for Windows, under <code>tests/</code></td>
+</tr>
+<tr>
+<td>CI/CD</td>
+<td>GitHub Actions workflows plus composite actions, on self-hosted runners</td>
+</tr>
+<tr>
+<td>Cloud access</td>
+<td>GitHub OIDC to an AWS IAM role: no long-lived AWS keys</td>
+</tr>
+</tbody>
+</table>
+<h2 id="repository">Repository</h2>
+<p>The code is at <a href="https://github.com/natsuichigo/packer-image-pipeline">natsuichigo/packer-image-pipeline</a>.
+The build standards in <code>docs/standards/</code> define the conventions every build follows:
+block order, naming, credentials, tags, pipeline shape and validation.</p>
+
+        </article>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="md-footer">
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">Packer Golden Image Pipeline — Mark</div>
+    </div>
+  </div>
+</footer>
+
+</div>
+
+<script>
+(function(){
+  function buildToc(){
+    var toc=document.getElementById("pd-toc");
+    if(!toc)return;
+    var headings=document.querySelectorAll(".md-typeset h2");
+    if(!headings.length){
+      var sec=toc.closest(".md-sidebar--secondary");
+      if(sec)sec.style.display="none";
+      return;
+    }
+    var html="";
+    for(var i=0;i<headings.length;i++){
+      var h=headings[i];
+      if(!h.id)h.id="section-"+i;
+      html+='<li class="md-nav__item"><a class="md-nav__link" href="#'+h.id+'">'+h.textContent+'</a></li>';
+    }
+    toc.innerHTML=html;
+  }
+  function initScrollSpy(){
+    var links=document.querySelectorAll("#pd-toc .md-nav__link");
+    if(!links.length)return;
+    function onScroll(){
+      var hs=document.querySelectorAll(".md-typeset h2"),active=null;
+      var st=window.pageYOffset||document.documentElement.scrollTop||0;
+      for(var i=hs.length-1;i>=0;i--){if(hs[i].getBoundingClientRect().top+st-140<=st){active=hs[i].id;break;}}
+      for(var j=0;j<links.length;j++){links[j].className=active&&links[j].getAttribute("href")==="#"+active?"md-nav__link md-nav__link--active":"md-nav__link";}
+    }
+    window.addEventListener("scroll",onScroll,{passive:true});
+  }
+  if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",function(){buildToc();initScrollSpy();});}
+  else{buildToc();initScrollSpy();}
+})();
+</script>
+
+<button class="back-to-top" id="back-to-top" aria-label="Back to top" title="Back to top">&#8679;</button>
+<script>(function(){var b=document.getElementById("back-to-top");window.addEventListener("scroll",function(){b.classList.toggle("visible",window.scrollY>400);},{passive:true});b.addEventListener("click",function(){window.scrollTo({top:0,behavior:"smooth"});});})();</script>
+    <data id="pnav-next" data-href="./architecture.html" data-label="Architecture &#9654;" hidden></data>
+</body>
+</html>

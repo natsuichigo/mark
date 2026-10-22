@@ -1,0 +1,327 @@
+@import url("theme.css");
+/* ═══════════════════════════════════════════════════════════
+   portfolio-site-docs.css — Content component styles for the
+   portfolio-site case study, scoped to .pip-typeset.
+   Layout, sidebar, header, footer: MkDocs Material CSS.
+   Brand tokens: assets/theme.css (via docs/theme.local.css).
+   Clone this file (scaffold_project.py --like portfolio-site) for a new set.
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Nav section labels (Getting Started, etc.) ──────────── */
+.md-nav__section-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(30, 41, 59,0.55);
+  color: rgba(var(--brand-primary-rgb),0.55);
+  padding: 12px 10px 4px;
+  pointer-events: none;
+  list-style: none;
+}
+
+/* ── Content typography ──────────────────────────────────── */
+.pip-typeset {
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+.pip-typeset h1,
+.pip-typeset .page-title {
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: #1e293b;
+  color: var(--brand-primary);
+  margin: 0 0 0.35rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid rgba(30, 41, 59,0.2);
+  border-bottom: 1px solid rgba(var(--brand-primary-rgb),0.2);
+  line-height: 1.15;
+}
+
+.pip-typeset .page-sub {
+  color: #475569;
+  color: var(--brand-text-sub);
+  font-size: 1.05rem;
+  margin: 0 0 1.8rem;
+}
+
+.pip-typeset h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #ffffff;
+  background: linear-gradient(135deg, #1e293b, #4f46e5);
+  background: linear-gradient(135deg, var(--brand-primary), var(--brand-accent));
+  padding: 0.45rem 0.8rem;
+  border-radius: 0.5rem;
+  margin: 2rem 0 0.75rem;
+  border: none;
+}
+
+.pip-typeset h3 {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #1e293b;
+  color: var(--brand-primary);
+  border-left: 4px solid #4f46e5;
+  border-left: 4px solid var(--brand-accent);
+  padding-left: 0.6rem;
+  margin: 1.4rem 0 0.5rem;
+  border-bottom: none;
+}
+
+/* ── Tables ──────────────────────────────────────────────── */
+.pip-typeset table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(30, 41, 59,0.18);
+  border: 1px solid rgba(var(--brand-primary-rgb),0.18);
+  background: #ffffff;
+  margin: 0.8rem 0 1.2rem;
+  font-size: 0.9rem;
+}
+.pip-typeset th {
+  background: linear-gradient(135deg, #1e293b, #4f46e5);
+  background: linear-gradient(135deg, var(--brand-primary), var(--brand-accent));
+  color: #ffffff;
+  font-weight: 600;
+  text-align: left;
+  padding: 9px 14px;
+  white-space: nowrap;
+}
+.pip-typeset td {
+  padding: 8px 14px;
+  border-bottom: 1px solid #e2e8f0;
+  vertical-align: top;
+}
+.pip-typeset tr:last-child td { border-bottom: none; }
+.pip-typeset tr:hover td { background: rgba(var(--brand-accent-rgb),0.08); }
+.pip-typeset td code { font-size: 0.82em; }
+
+/* ── Callout boxes ───────────────────────────────────────── */
+.pip-typeset .callout {
+  border-left: 4px solid #4f46e5;
+  border-left: 4px solid var(--brand-accent);
+  background: rgba(79, 70, 229,0.06);
+  background: rgba(var(--brand-accent-rgb),0.06);
+  border-radius: 0 8px 8px 0;
+  padding: 0.7rem 1rem;
+  margin: 1rem 0;
+}
+.pip-typeset .callout.warn {
+  border-color: #f59e0b;
+  background: rgba(245,158,11,0.07);
+}
+.pip-typeset .callout p { margin: 0; font-size: 0.92rem; }
+
+/* ── Flow steps ──────────────────────────────────────────── */
+.pip-typeset .flow { display: flex; flex-direction: column; gap: 4px; margin: 1rem 0; }
+.pip-typeset .flow-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+.pip-typeset .flow-step.parallel { background: #eff6ff; border-color: #bfdbfe; }
+.pip-typeset .flow-step.aws      { background: #fff7ed; border-color: #fed7aa; }
+.pip-typeset .flow-num {
+  min-width: 26px; height: 26px; border-radius: 50%;
+  background: #1e293b; color: #fff;
+  background: var(--brand-primary); color: #fff;
+  font-size: 0.78rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.pip-typeset .flow-text { flex: 1; }
+.pip-typeset .flow-text strong { display: block; font-size: 0.95rem; color: var(--brand-heading); margin-bottom: 2px; }
+.pip-typeset .flow-text span   { font-size: 0.88rem; color: var(--brand-text-sub); }
+.pip-typeset .flow-arrow { text-align: center; color: #94a3b8; font-size: 1.2rem; line-height: 1.8; }
+
+/* ── Action cards ────────────────────────────────────────── */
+.pip-typeset .action-card {
+  background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px;
+  padding: 16px 18px; margin: 12px 0;
+}
+.pip-typeset .action-card h3 { margin: 0 0 8px; font-size: 0.95rem; color: var(--brand-primary); border: none; padding: 0; }
+.pip-typeset .action-card .path {
+  font-family: "Roboto Mono", monospace; font-size: 0.82rem;
+  color: #1e40af; background: #eff6ff;
+  padding: 3px 8px; border-radius: 4px; display: inline-block; margin-bottom: 8px;
+}
+.pip-typeset .action-card p  { margin: 0 0 6px; font-size: 0.9rem; }
+.pip-typeset .action-card ul { margin: 4px 0 6px; font-size: 0.9rem; }
+
+/* ── Role cards ──────────────────────────────────────────── */
+.pip-typeset .role-card {
+  background: #f8fafc; border: 1px solid #e2e8f0;
+  border-left: 4px solid #4f46e5; border-radius: 0 10px 10px 0;
+  border-left: 4px solid var(--brand-accent); border-radius: 0 10px 10px 0;
+  padding: 16px 18px; margin: 12px 0;
+}
+.pip-typeset .role-card.disabled { border-left-color: #9ca3af; background: #f9fafb; }
+.pip-typeset .role-card h3 { margin: 0 0 6px; font-size: 0.98rem; color: var(--brand-primary); border: none; padding: 0; }
+.pip-typeset .role-card .tag {
+  display: inline-block; font-size: 0.75rem; font-weight: 700;
+  padding: 2px 8px; border-radius: 999px; margin-left: 8px;
+}
+.pip-typeset .role-card .tag-active   { background: #dcfce7; color: #166534; }
+.pip-typeset .role-card .tag-disabled { background: #f3f4f6; color: #6b7280; }
+.pip-typeset .role-card p  { margin: 0; font-size: 0.9rem; }
+.pip-typeset .role-card ul { margin: 6px 0 0; font-size: 0.9rem; }
+
+/* ── Stage boxes ─────────────────────────────────────────── */
+.pip-typeset .stage-box {
+  border: 1px solid #e2e8f0; border-radius: 10px; padding: 18px; margin: 12px 0;
+}
+.pip-typeset .stage-box.s1 { border-left: 4px solid #f59e0b; background: #fffbeb; }
+.pip-typeset .stage-box.s2 { border-left: 4px solid #22c55e; background: #f0fdf4; }
+.pip-typeset .stage-box h3 { margin: 0 0 10px; border: none; padding: 0; }
+.pip-typeset .stage-box ol { margin: 0; }
+
+/* ── Validation check groups ─────────────────────────────── */
+.pip-typeset .check-group       { margin: 16px 0; }
+.pip-typeset .check-group-title { font-size: 0.82rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--brand-primary); margin: 0 0 8px; }
+.pip-typeset .check-list        { display: flex; flex-wrap: wrap; gap: 6px; }
+.pip-typeset .check {
+  display: inline-block; font-size: 0.82rem; padding: 3px 10px; border-radius: 6px;
+  background: #f1f5f9; color: #1e3a5f; font-family: "Roboto Mono", monospace;
+}
+
+/* ── Back-to-top button ──────────────────────────────────── */
+.pk-back-to-top {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 900;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1e293b, #4f46e5);
+  background: linear-gradient(135deg, var(--brand-primary), var(--brand-accent));
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(30, 41, 59,0.35);
+  box-shadow: 0 4px 12px rgba(var(--brand-primary-rgb),0.35);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  text-decoration: none;
+}
+.pk-back-to-top.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+.pk-back-to-top:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(30, 41, 59,0.45);
+  box-shadow: 0 6px 16px rgba(var(--brand-primary-rgb),0.45);
+}
+.pk-back-to-top svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: #fff;
+}
+@media (max-width: 600px) {
+  .pk-back-to-top {
+    bottom: 1rem;
+    right: 1rem;
+  }
+}
+
+/* ── Badges ──────────────────────────────────────────────── */
+.pip-typeset .badge       { display: inline-block; padding: 4px 12px; border-radius: 999px; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.04em; }
+.pip-typeset .badge-blue  { background: #dbeafe; color: #1e40af; }
+.pip-typeset .badge-green { background: #dcfce7; color: #166534; }
+.pip-typeset .badge-amber { background: #fef3c7; color: #92400e; }
+.pip-typeset .badge-row   { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 20px; }
+
+/* ── req / opt labels ────────────────────────────────────── */
+.pip-typeset .req { color: #dc2626; font-weight: 700; font-size: 0.8rem; }
+.pip-typeset .opt { color: #6b7280; font-weight: 700; font-size: 0.8rem; }
+
+/* ── Priority ladder (order-of-precedence diagram) ──────────
+   Original component: a row of tiers shaded from light to dark
+   (navy → blue), lowest priority first, with a labelled arrow
+   underneath. Used to visualise "which value wins" style rules. */
+.pip-typeset .priority-ladder { margin: 1.2rem 0 0.6rem; }
+.pip-typeset .priority-ladder__track {
+  display: flex; gap: 8px; align-items: stretch;
+  flex-wrap: wrap;
+}
+.pip-typeset .priority-tier {
+  flex: 1 1 0; min-width: 120px;
+  border-radius: 8px; padding: 12px 10px;
+  color: #fff; text-align: center;
+  display: flex; flex-direction: column; justify-content: center; gap: 4px;
+}
+.pip-typeset .priority-tier .tier-num {
+  font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; opacity: 0.85;
+}
+.pip-typeset .priority-tier .tier-label { font-size: 0.86rem; font-weight: 700; line-height: 1.25; }
+.pip-typeset .priority-tier.p1 { background: #c7d7f0; color: var(--brand-heading); }
+.pip-typeset .priority-tier.p2 { background: #7fa3d9; }
+.pip-typeset .priority-tier.p3 { background: #3868b0; }
+.pip-typeset .priority-tier.p4 { background: var(--brand-primary); }
+.pip-typeset .priority-ladder__scale {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 8px; font-size: 0.78rem; font-weight: 700;
+  letter-spacing: 0.04em; text-transform: uppercase; color: #475569;
+}
+.pip-typeset .priority-ladder__scale .arrow-track {
+  flex: 1; height: 6px; margin: 0 10px; border-radius: 3px;
+  background: linear-gradient(90deg, #c7d7f0, #1e293b);
+  background: linear-gradient(90deg, #c7d7f0, var(--brand-primary));
+  position: relative;
+}
+.pip-typeset .priority-ladder__scale .arrow-track::after {
+  content: ""; position: absolute; right: -2px; top: -4px;
+  border: 7px solid transparent; border-left-color: #1e293b;
+  border: 7px solid transparent; border-left-color: var(--brand-primary);
+}
+
+/* ── Directory tree ──────────────────────────────────────── */
+.pip-typeset .dir-tree {
+  background: #0f172a;
+  color: #e2e8f0;
+  border-radius: 10px;
+  padding: 1.1rem 1.3rem;
+  font-family: "Roboto Mono", monospace;
+  font-size: 0.85rem;
+  line-height: 1.75;
+  white-space: pre-wrap;
+  word-break: normal;
+  overflow-x: hidden;
+  border: 1px solid rgba(30, 41, 59, 0.25);
+  border: 1px solid rgba(var(--brand-primary-rgb), 0.25);
+  margin: 0.8rem 0 1.2rem;
+}
+.pip-typeset .dir-tree .hl  { color: #7dd3fc; font-weight: 700; }
+.pip-typeset .dir-tree .cm  { color: #64748b; font-style: italic; }
+
+/* ── Architecture diagram ────────────────────────────────── */
+.pip-typeset .arch-diagram-wrap {
+  background: #f8fafc;
+  border: 1px solid rgba(30, 41, 59, 0.14);
+  border: 1px solid rgba(var(--brand-primary-rgb), 0.14);
+  border-radius: 12px;
+  padding: 0.4rem;
+  margin: 0.8rem 0 1.4rem;
+  overflow-x: auto;
+}
+.pip-typeset .arch-diagram {
+  display: block;
+  width: 100%;
+  min-width: 640px;
+  height: auto;
+  margin: 0 auto;
+}

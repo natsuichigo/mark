@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>How Deployment Works — This Portfolio Site</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+    <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+    <link rel="prev" href="architecture.html">
+    <link rel="next" href="claude-skills.html">
+    <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+    <link rel="stylesheet" href="../theme.local.css">
+    <link rel="stylesheet" href="../../assets/portfolio-site-docs.css">
+</head>
+<body dir="ltr">
+
+<input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+<label class="md-overlay" for="__drawer"></label>
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="./index.html" title="This Portfolio Site" class="md-header__button md-logo" aria-label="This Portfolio Site"></a>
+    <label class="md-header__button md-icon" for="__drawer" aria-label="Open navigation">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic"><span class="md-ellipsis">This Portfolio Site</span></div>
+        <div class="md-header__topic" data-md-component="header-topic"><span class="md-ellipsis">How Deployment Works</span></div>
+      </div>
+    </div>
+  </nav>
+  <div class="hdr-page-nav" id="hdr-page-nav" aria-label="Page navigation"></div>
+  <script>(function(){function slugToTitle(h){var n=h.split("/").pop().replace(/\.html$/,"").replace(/-/g," ");return n.charAt(0).toUpperCase()+n.slice(1);}function buildNav(){var row=document.getElementById("hdr-page-nav");if(!row)return;var pE=document.querySelector("link[rel=prev]"),nE=document.querySelector("link[rel=next]"),pO=document.getElementById("pnav-prev"),nO=document.getElementById("pnav-next");var pH=pO?pO.dataset.href:(pE?pE.getAttribute("href"):null),pL=pO?pO.dataset.label:(pE?"&#9664; "+slugToTitle(pE.getAttribute("href")):null),nH=nO?nO.dataset.href:(nE?nE.getAttribute("href"):null),nL=nO?nO.dataset.label:(nE?slugToTitle(nE.getAttribute("href"))+" &#9654;":null);row.innerHTML=(pH?'<a class="hdr-page-nav__link hdr-page-nav__prev" href="'+pH+'">'+pL+'</a>':'<span class="hdr-page-nav__spacer"></span>')+'<div class="hdr-page-nav__centre"><a class="hdr-page-nav__link hdr-page-nav__hub" href="../../projects/index.html">Projects</a><a class="hdr-page-nav__link hdr-page-nav__docidx" href="./index.html">Portfolio Site</a><a class="hdr-page-nav__link hdr-page-nav__portal" href="../../index.html">Home</a></div>'+(nH?'<a class="hdr-page-nav__link hdr-page-nav__next" href="'+nH+'">'+nL+'</a>':'<span class="hdr-page-nav__spacer"></span>');}if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",buildNav);}else{buildNav();}})()</script>
+</header>
+
+<div class="md-container">
+  <main class="md-main">
+    <div class="md-main__inner md-grid">
+
+      <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+        <div class="md-sidebar__scrollwrap"><div class="md-sidebar__inner">
+          <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+            <label class="md-nav__title" for="__drawer">
+              <a href="./index.html" class="md-nav__button md-logo" aria-label="This Portfolio Site"></a>
+              This Portfolio Site
+            </label>
+            <ul class="md-nav__list">
+              <li class="md-nav__item md-nav__section-label">The Project</li>
+              <li class="md-nav__item"><a href="./overview.html" class="md-nav__link">Overview</a></li>
+              <li class="md-nav__item"><a href="./architecture.html" class="md-nav__link">Architecture</a></li>
+              <li class="md-nav__item md-nav__section-label">How It Works</li>
+              <li class="md-nav__item"><a href="./how-deployment-works.html" class="md-nav__link md-nav__link--active">How Deployment Works</a></li>
+              <li class="md-nav__item"><a href="./claude-skills.html" class="md-nav__link">The Claude Skills</a></li>
+              <li class="md-nav__item md-nav__section-label">Reflections</li>
+              <li class="md-nav__item"><a href="./lessons.html" class="md-nav__link">Lessons &amp; Next Steps</a></li>
+            </ul>
+          </nav>
+        </div></div>
+      </div>
+
+      <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc">
+        <div class="md-sidebar__scrollwrap"><div class="md-sidebar__inner">
+          <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+            <label class="md-nav__title">On this page</label>
+            <ul class="md-nav__list" id="pd-toc"></ul>
+          </nav>
+        </div></div>
+      </div>
+
+      <div class="md-content" data-md-component="content">
+        <article class="md-content__inner md-typeset ps-typeset">
+
+        <h1 class="page-title">How Deployment Works</h1>
+        <p class="page-sub">From a push to <code>main</code> to a live page, in one short workflow.</p>
+<p>One workflow publishes the site: <code>.github/workflows/deploy-pages.yml</code>. It has two
+jobs. <code>build</code> uploads <code>_deploy/</code> as a Pages artifact, and <code>deploy</code> publishes it.
+Nothing in it builds or changes a page.</p>
+<div class="flow">
+<div class="flow-step"><div class="flow-num">1</div><div class="flow-text"><strong>Push to <code>main</code></strong><span>Touching <code>_deploy/**</code> or the workflow file</span></div></div>
+<div class="flow-arrow">↓</div>
+<div class="flow-step"><div class="flow-num">2</div><div class="flow-text"><strong><code>build</code> job</strong><span>Checkout → <code>configure-pages</code> → upload <code>_deploy/</code> as the Pages artifact</span></div></div>
+<div class="flow-arrow">↓</div>
+<div class="flow-step"><div class="flow-num">3</div><div class="flow-text"><strong><code>deploy</code> job</strong><span><code>needs: build</code>, <code>environment: github-pages</code> → <code>actions/deploy-pages</code> → a run summary with links to the live site</span></div></div>
+</div>
+
+<h2 id="what-triggers-it">What Triggers It</h2>
+<pre><code class="language-yaml">on:
+  push:
+    branches: [main]
+    paths: ['_deploy/**', '.github/workflows/deploy-pages.yml']
+  pull_request:
+    branches: [main]
+    paths: ['_deploy/**', '.github/workflows/deploy-pages.yml']
+  workflow_dispatch:
+</code></pre>
+<ul>
+<li><strong>Branch-gated.</strong> Only <code>main</code> publishes. The <code>portfolio</code> ruleset in my
+  <a href="https://github.com/natsuichigo/github-rulesets">github-rulesets</a> repo protects it:
+  changes go through a pull request, and force-pushes and deletion are blocked.</li>
+<li><strong>Path-gated.</strong> A change outside <code>_deploy/</code>, such as a <code>README.md</code> edit, does not
+  deploy. <code>workflow_dispatch</code> runs it by hand when needed.</li>
+<li><strong>Pull requests build but do not publish.</strong> GitHub Pages has one live deployment
+  per repository, so publishing an unmerged PR would overwrite the live site. The
+  <code>deploy</code> job is skipped for pull requests, and the built artifact stays on the run
+  for inspection.</li>
+</ul>
+<h2 id="permissions">Permissions</h2>
+<pre><code class="language-yaml">permissions:
+  contents: read      # checkout
+  pages: write        # publish to Pages
+  id-token: write     # OIDC, required by deploy-pages
+</code></pre>
+<p>The workflow needs no secrets. The Pages source must be set to <strong>GitHub Actions</strong>
+(Settings → Pages → Source).</p>
+<h2 id="concurrency">Concurrency</h2>
+<pre><code class="language-yaml">concurrency:
+  group: pages-${{ github.event.pull_request.number || 'production' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+</code></pre>
+<p>Production deploys share one group and queue, so two merges never race. Each pull
+request gets its own group and cancels its superseded runs.</p>
+<h2 id="pinned-actions">Pinned Actions</h2>
+<p>Every action is pinned to a full commit SHA rather than a tag, for example
+<code>actions/checkout@de0fac2e…</code>. A tag can be moved to point at different code; a SHA
+cannot.</p>
+<h2 id="what-ci-does-not-check">What CI Does Not Check</h2>
+<div class="callout warn">
+<p><strong>Nothing in CI validates the pages.</strong> There is no link checker or HTML validator in the workflow, so a broken link would deploy. I run the checks myself before pushing: <code>validate_pages.py</code> for case studies, <code>validate_deck.py</code> and <code>screenshot_deck.py</code> for decks. Adding a link check to the <code>build</code> job is on the <a href="./lessons.html">next steps</a> list.</p>
+</div>
+
+        </article>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="md-footer">
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">This Portfolio Site — Mark</div>
+    </div>
+  </div>
+</footer>
+
+</div>
+
+<script>
+(function(){
+  function buildToc(){
+    var toc=document.getElementById("pd-toc");
+    if(!toc)return;
+    var headings=document.querySelectorAll(".md-typeset h2");
+    if(!headings.length){
+      var sec=toc.closest(".md-sidebar--secondary");
+      if(sec)sec.style.display="none";
+      return;
+    }
+    var html="";
+    for(var i=0;i<headings.length;i++){
+      var h=headings[i];
+      if(!h.id)h.id="section-"+i;
+      html+='<li class="md-nav__item"><a class="md-nav__link" href="#'+h.id+'">'+h.textContent+'</a></li>';
+    }
+    toc.innerHTML=html;
+  }
+  function initScrollSpy(){
+    var links=document.querySelectorAll("#pd-toc .md-nav__link");
+    if(!links.length)return;
+    function onScroll(){
+      var hs=document.querySelectorAll(".md-typeset h2"),active=null;
+      var st=window.pageYOffset||document.documentElement.scrollTop||0;
+      for(var i=hs.length-1;i>=0;i--){if(hs[i].getBoundingClientRect().top+st-140<=st){active=hs[i].id;break;}}
+      for(var j=0;j<links.length;j++){links[j].className=active&&links[j].getAttribute("href")==="#"+active?"md-nav__link md-nav__link--active":"md-nav__link";}
+    }
+    window.addEventListener("scroll",onScroll,{passive:true});
+  }
+  if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",function(){buildToc();initScrollSpy();});}
+  else{buildToc();initScrollSpy();}
+})();
+</script>
+
+<button class="back-to-top" id="back-to-top" aria-label="Back to top" title="Back to top">&#8679;</button>
+<script>(function(){var b=document.getElementById("back-to-top");window.addEventListener("scroll",function(){b.classList.toggle("visible",window.scrollY>400);},{passive:true});b.addEventListener("click",function(){window.scrollTo({top:0,behavior:"smooth"});});})();</script>
+    <data id="pnav-prev" data-href="./architecture.html" data-label="&#9664; Architecture" hidden></data>
+    <data id="pnav-next" data-href="./claude-skills.html" data-label="The Claude Skills &#9654;" hidden></data>
+</body>
+</html>

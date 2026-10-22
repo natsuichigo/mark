@@ -1,0 +1,14 @@
+{
+  "site_name": "Ansible EE Pipeline",
+  "docidx_label": "Ansible EE Pipeline",
+  "css_file": "ansible-ee-pipeline-docs.css",
+  "footer_name": "Ansible EE Pipeline — Mark",
+  "typeset_prefix": "aep",
+  "depth": 2,
+  "nav": [
+    {"slug": "overview.html", "title": "Overview", "section": "The Project"},
+    {"slug": "architecture.html", "title": "Architecture", "section": "The Project"},
+    {"slug": "how-it-works.html", "title": "How It Works", "section": "Deep Dive"},
+    {"slug": "lessons.html", "title": "Lessons & Next Steps", "section": "Deep Dive"}
+  ]
+}

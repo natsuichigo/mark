@@ -1,0 +1,39 @@
+/* ═══════════════════════════════════════════════════════════════
+   theme.css  —  The one file to edit to rebrand the portal.
+
+   Every page, hub, doc set and deck reads its brand colours from
+   these custom properties. Change the values here and the whole
+   site follows; nothing else hard-codes the palette.
+
+   The *-rgb variants must match their hex twin. They exist so
+   pages can use the brand colour at any opacity:
+       rgba(var(--brand-primary-rgb), 0.18)
+
+   Default: a neutral slate / indigo / sky palette.
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  /* Core brand */
+  --brand-primary:        #1e293b;   /* headers, links, primary buttons   */
+  --brand-primary-light:  #334155;   /* hover, secondary buttons           */
+  --brand-primary-dark:   #0f172a;   /* deep shadows, pressed states       */
+  --brand-accent:         #4f46e5;   /* highlights, active nav, focus      */
+  --brand-accent-2:       #0ea5e9;   /* third gradient stop, deck bullets  */
+
+  /* Same colours as "r, g, b" triplets for rgba() */
+  --brand-primary-rgb:      30, 41, 59;
+  --brand-primary-dark-rgb: 15, 23, 42;
+  --brand-accent-rgb:       79, 70, 229;
+  --brand-accent-2-rgb:     14, 165, 233;
+
+  /* Text and surfaces */
+  --brand-heading:        #1e293b;
+  --brand-text:           #0f172a;
+  --brand-text-sub:       #475569;
+  --brand-muted:          #64748b;
+  --brand-bg:             #f1f5f9;
+  --brand-code-bg:        #eef2ff;
+  --brand-code-fg:        #312e81;
+
+  /* The signature gradient used by hero panels and the site header */
+  --brand-gradient: linear-gradient(135deg, var(--brand-primary), var(--brand-accent) 60%, var(--brand-accent-2));
+}

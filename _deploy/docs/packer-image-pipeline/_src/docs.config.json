@@ -1,0 +1,14 @@
+{
+  "site_name": "Packer Golden Image Pipeline",
+  "docidx_label": "Packer Pipeline",
+  "css_file": "packer-image-pipeline-docs.css",
+  "footer_name": "Packer Golden Image Pipeline — Mark",
+  "typeset_prefix": "pip",
+  "depth": 2,
+  "nav": [
+    {"slug": "overview.html", "title": "Overview", "section": "The Project"},
+    {"slug": "architecture.html", "title": "Architecture", "section": "The Project"},
+    {"slug": "how-it-works.html", "title": "How It Works", "section": "Deep Dive"},
+    {"slug": "lessons.html", "title": "Lessons & Next Steps", "section": "Deep Dive"}
+  ]
+}

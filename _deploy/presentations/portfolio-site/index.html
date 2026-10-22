@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>This Portfolio Site — Mark</title>
+    <link rel="stylesheet" href="../../assets/theme.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reset.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/white.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="../layout-fix.css" />
+    <style>
+      /* Per-deck CSS only. NEVER edit ../layout-fix.css — every deck shares it.
+         Sizes below use the shared clamp(<rem>, <vw>, <rem>) idiom so the deck
+         scales as one set; see SKILL.md section 4a. */
+      /* ~85% of the shared table size, same clamp() idiom so it scales with it. */
+      .reveal table.compact { font-size: clamp(0.7rem, 1.06vw, 0.92rem); }
+      .reveal table.compact td, .reveal table.compact th { padding: 4px 8px; }
+      .reveal table.compact code { font-size: 0.94em; padding: 1px 4px; }
+      /* The shared .reveal pre sets white-space: pre-wrap + word-break: break-word,
+         which wraps a wide ASCII diagram mid-line and destroys its alignment. */
+      .reveal pre.flow, .reveal pre.flow-sm {
+        white-space: pre;
+        word-break: normal;
+        overflow-x: auto;
+      }
+      .reveal pre.flow    { font-size: clamp(0.54rem, 0.8vw, 0.74rem); line-height: 1.38; }
+      .reveal pre.flow-sm { font-size: clamp(0.46rem, 0.7vw, 0.64rem); line-height: 1.34; }
+      /* Big-number tiles. */
+      .reveal .stat-row {
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(7.5em, 1fr));
+        gap: 0.6em; margin: 0.4em 0;
+      }
+      .reveal .stat {
+        display: flex; flex-direction: column; gap: 0.2em; padding: 0.7em 0.9em;
+        border-radius: 12px; color: #fff; box-shadow: 0 8px 20px rgba(var(--brand-primary-rgb), 0.18);
+      }
+      .reveal .stat-navy   { background: linear-gradient(135deg, var(--brand-primary), var(--brand-primary-light)); }
+      .reveal .stat-blue   { background: linear-gradient(135deg, var(--brand-accent-2), var(--brand-accent)); }
+      .reveal .stat-green  { background: linear-gradient(135deg, #0f7a3d, #22a45d); }
+      .reveal .stat-yellow { background: linear-gradient(135deg, #b7791f, #e0a526); }
+      .reveal .stat-red    { background: linear-gradient(135deg, var(--brand-accent), var(--brand-accent-2)); }
+      .reveal .stat-value { font-size: clamp(1.6rem, 3.2vw, 2.8rem); font-weight: 800; line-height: 1; }
+      .reveal .stat-label { font-size: clamp(0.72rem, 0.98vw, 0.92rem); opacity: 0.92; }
+    </style>
+  </head>
+  <!-- DEEP-DIVE deck — for engineers / technical interviews: architecture, decisions, trade-offs.
+       audience: Engineers: how the site is built, deployed and maintained -->
+  <body>
+    <div class="local-return-bar">
+      <a href="../../walkthroughs/index.html">&larr; Back to Walkthroughs</a>
+    </div>
+    <div class="reveal">
+      <div class="slides">
+
+        <section class="title-slide" data-background-gradient="linear-gradient(135deg, #1e293b, #4f46e5 60%, #0ea5e9)">
+          <div class="logo-row">
+            <img class="brand-logo brand-logo-site" src="../../assets/logo.svg" alt="Mark" />
+          </div>
+          <h1>This Portfolio Site</h1>
+          <p class="subtitle">Markdown in, GitHub Pages out, with no build step</p>
+          <p>
+            <span class="pill pill-navy">Static HTML</span>
+            <span class="pill pill-blue">One workflow</span>
+            <span class="pill pill-green">Zero secrets</span>
+            <span class="pill pill-yellow">Claude Code skills</span>
+          </p>
+          <p class="team">Mark — DevOps &amp; Platform Engineer</p>
+          <a href="../../docs/portfolio-site/index.html" class="btn"><i class="fas fa-book"></i> Read the Case Study</a>
+        </section>
+
+        <section class="agenda-slide" data-background-color="#f1f5f9">
+          <h2><i class="fas fa-list-check"></i> Agenda</h2>
+          <p class="agenda-intro">
+            From what the site is, through how it is built and deployed, to what I learned. Select any slide to jump to it.
+          </p>
+          <div class="agenda-grid" aria-label="Agenda quick navigation">
+            <div class="agenda-phase">The Project</div>
+            <button type="button" class="agenda-card" data-slide-target="2" data-slide-start="2" data-slide-end="2">
+              <span class="agenda-card__order">01</span>
+              <span class="agenda-card__icon"><i class="fas fa-circle-info"></i></span>
+              <span class="agenda-card__body">
+                <span class="agenda-card__title">What This Site Is</span>
+                <span class="agenda-card__meta">Slide 3</span>
+              </span>
+              <span class="agenda-card__arrow"><i class="fas fa-arrow-right"></i></span>
+            </button>
+            <button type="button" class="agenda-card" data-slide-target="3" data-slide-start="3" data-slide-end="3">
+              <span class="agenda-card__order">02</span>
+              <span class="agenda-card__icon"><i class="fas fa-layer-group"></i></span>
+              <span class="agenda-card__body">
+                <span class="agenda-card__title">Two Kinds of Page</span>
+                <span class="agenda-card__meta">Slide 4</span>
+              </span>
+              <span class="agenda-card__arrow"><i class="fas fa-arrow-right"></i></span>
+            </button>
+            <div class="agenda-phase">How It Works</div>
+            <button type="button" class="agenda-card" data-slide-target="4" data-slide-start="4" data-slide-end="4">
+              <span class="agenda-card__order">03</span>
+              <span class="agenda-card__icon"><i class="fas fa-rocket"></i></span>
+              <span class="agenda-card__body">
+                <span class="agenda-card__title">From Push to Live Page</span>
+                <span class="agenda-card__meta">Slide 5</span>
+              </span>
+              <span class="agenda-card__arrow"><i class="fas fa-arrow-right"></i></span>
+            </button>
+            <button type="button" class="agenda-card" data-slide-target="5" data-slide-start="5" data-slide-end="5">
+              <span class="agenda-card__order">04</span>
+              <span class="agenda-card__icon"><i class="fas fa-file-code"></i></span>
+              <span class="agenda-card__body">
+                <span class="agenda-card__title">Markdown In, Pages Out</span>
+                <span class="agenda-card__meta">Slide 6</span>
+              </span>
+              <span class="agenda-card__arrow"><i class="fas fa-arrow-right"></i></span>
+            </button>
+            <button type="button" class="agenda-card" data-slide-target="6" data-slide-start="6" data-slide-end="6">
+              <span class="agenda-card__order">05</span>
+              <span class="agenda-card__icon"><i class="fas fa-display"></i></span>
+              <span class="agenda-card__body">
+                <span class="agenda-card__title">Decks Built From the Case Studies</span>
+                <span class="agenda-card__meta">Slide 7</span>
+              </span>
+              <span class="agenda-card__arrow"><i class="fas fa-arrow-right"></i></span>
+            </button>
+            <div class="agenda-phase">Reflections</div>
+            <button type="button" class="agenda-card" data-slide-target="7" data-slide-start="7" data-slide-end="7">
+              <span class="agenda-card__order">06</span>
+              <span class="agenda-card__icon"><i class="fas fa-scale-balanced"></i></span>
+              <span class="agenda-card__body">
+                <span class="agenda-card__title">Trade-offs and Lessons</span>
+                <span class="agenda-card__meta">Slide 8</span>
+              </span>
+              <span class="agenda-card__arrow"><i class="fas fa-arrow-right"></i></span>
+            </button>
+            <button type="button" class="agenda-card" data-slide-target="8" data-slide-start="8" data-slide-end="8">
+              <span class="agenda-card__order">07</span>
+              <span class="agenda-card__icon"><i class="fas fa-forward"></i></span>
+              <span class="agenda-card__body">
+                <span class="agenda-card__title">Next Steps</span>
+                <span class="agenda-card__meta">Slide 9</span>
+              </span>
+              <span class="agenda-card__arrow"><i class="fas fa-arrow-right"></i></span>
+            </button>
+          </div>
+        </section>
+
+        <section data-background-color="#f1f5f9">
+          <h2><i class="fas fa-circle-info"></i> What This Site Is</h2>
+          <div class="box box-navy">
+            <strong><i class="fas fa-bullseye"></i> The one-sentence version:</strong>
+            I commit HTML into <code>_deploy/</code> on <code>main</code>, and one GitHub Actions workflow uploads that folder to GitHub Pages exactly as it is.
+          </div>
+          <table class="compact">
+            <thead>
+              <tr>
+                <th>URL</th>
+                <th>What it is</th>
+                <th>How it is made</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>/</code></td>
+                <td>Home</td>
+                <td>Written by hand</td>
+              </tr>
+              <tr>
+                <td><code>/projects/</code></td>
+                <td>One card per case study</td>
+                <td>Written by hand</td>
+              </tr>
+              <tr>
+                <td><code>/docs/&lt;project&gt;/</code></td>
+                <td>A case study</td>
+                <td class="cell-green">Generated from Markdown</td>
+              </tr>
+              <tr>
+                <td><code>/walkthroughs/</code></td>
+                <td>One card per deck</td>
+                <td>Written by hand</td>
+              </tr>
+              <tr>
+                <td><code>/presentations/&lt;slug&gt;/</code></td>
+                <td>A reveal.js deck</td>
+                <td class="cell-green">Generated from a deck plan</td>
+              </tr>
+              <tr>
+                <td><code>/about/</code></td>
+                <td>Skills and contact</td>
+                <td>Written by hand</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+        <section data-background-color="#f1f5f9">
+          <h2><i class="fas fa-layer-group"></i> Two Kinds of Page</h2>
+          <div class="cols split-panels">
+            <div class="split-panel split-panel-blue">
+              <h3><i class="fas fa-hand"></i> Hub pages</h3>
+              <ul class="tight">
+                <li>Home, Projects, Walkthroughs, About, each case study's index</li>
+                <li>Card grids styled by the shared <code>hub.css</code></li>
+                <li>Nav injected by <code>site-chrome.js</code> from a few <code>&lt;meta&gt;</code> tags</li>
+                <li>Edited by hand</li>
+              </ul>
+            </div>
+            <div class="split-panel split-panel-green">
+              <h3><i class="fas fa-wand-magic-sparkles"></i> Content pages</h3>
+              <ul class="tight">
+                <li>Every <code>docs/&lt;project&gt;/*.html</code> except the index</li>
+                <li>MkDocs-Material layout: sidebar, contents, previous/next</li>
+                <li>Written in Markdown in <code>_src/</code></li>
+                <li>Never edited by hand: the next build overwrites them</li>
+              </ul>
+            </div>
+          </div>
+          <div class="box box-blue">
+            <strong><i class="fas fa-palette"></i> One brand file.</strong>
+            Every page and deck reads its colours from <code>assets/theme.css</code>.
+          </div>
+        </section>
+        <section data-background-color="#f1f5f9">
+          <h2><i class="fas fa-rocket"></i> From Push to Live Page</h2>
+          <pre class="flow"><code>push to main ──► build job ─────────────────────► deploy job
+(_deploy/** or    checkout                         actions/deploy-pages
+ the workflow)    configure-pages                  run summary with links
+                  upload _deploy/ as the artifact</code></pre>
+          <div class="cols">
+            <div>
+              <ul class="tight">
+                <li><strong>Pull requests build, never publish</strong>: Pages has one live deployment per repo</li>
+                <li><strong>Path-gated</strong>: a README edit does not deploy</li>
+                <li><strong>Actions pinned to commit SHAs</strong></li>
+              </ul>
+            </div>
+            <div>
+              <div class="box box-green">
+                <strong><i class="fas fa-lock"></i> Permissions:</strong>
+                <code>contents: read</code>, <code>pages: write</code>, <code>id-token: write</code>. No secrets at all.
+              </div>
+            </div>
+          </div>
+        </section>
+        <section data-background-color="#f1f5f9">
+          <h2><i class="fas fa-file-code"></i> Markdown In, Pages Out</h2>
+          <pre class="flow-sm"><code>scaffold_project.py ──► _src/*.md + docs.config.json ──► build_project.py ──► validate_pages.py
+  index page, CSS          one file per page, nav order      every page rebuilt     links, sidebar, tags</code></pre>
+          <div class="stat-row">
+            <div class="stat stat-navy"><span class="stat-value">4</span><span class="stat-label">case studies</span></div>
+            <div class="stat stat-blue"><span class="stat-value">17</span><span class="stat-label">generated pages</span></div>
+            <div class="stat stat-green"><span class="stat-value">1</span><span class="stat-label">workflow</span></div>
+            <div class="stat stat-yellow"><span class="stat-value">0</span><span class="stat-label">secrets</span></div>
+          </div>
+          <div class="box box-yellow">
+            <strong><i class="fas fa-triangle-exclamation"></i> The sidebar is baked into every page.</strong>
+            Add or reorder one page and every page in the set changes, so the build always regenerates the whole set.
+          </div>
+        </section>
+        <section data-background-color="#f1f5f9">
+          <h2><i class="fas fa-display"></i> Decks Built From the Case Studies</h2>
+          <p>The <code>docs-to-deck</code> skill reads a case study's pages and builds a reveal.js deck from a JSON plan. The first question is always who it is for:</p>
+          <table class="compact">
+            <thead>
+              <tr>
+                <th>Deck type</th>
+                <th>Audience</th>
+                <th>Shape</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>overview</code></td>
+                <td>Recruiters, hiring managers</td>
+                <td>Short, outcome-first, little code</td>
+              </tr>
+              <tr>
+                <td><code>deep-dive</code></td>
+                <td>Engineers, technical interviews</td>
+                <td>Architecture, decisions, trade-offs</td>
+              </tr>
+              <tr>
+                <td><code>talk</code></td>
+                <td>A meetup or team talk</td>
+                <td>Story-led: problem to lessons</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="box box-blue">
+            <strong><i class="fas fa-camera"></i> Checked by rendering.</strong>
+            <code>screenshot_deck.py</code> renders every slide in Playwright and measures overflow, because a slide that spills over still passes every structural check.
+          </div>
+        </section>
+        <section data-background-color="#f1f5f9">
+          <h2><i class="fas fa-scale-balanced"></i> Trade-offs and Lessons</h2>
+          <div class="cols split-panels">
+            <div class="split-panel split-panel-green">
+              <h3><i class="fas fa-check"></i> No build step gives</h3>
+              <ul class="tight">
+                <li>Deployment cannot break a page</li>
+                <li>No generator or theme upgrades</li>
+                <li>A one-job workflow with no secrets</li>
+              </ul>
+            </div>
+            <div class="split-panel split-panel-yellow">
+              <h3><i class="fas fa-coins"></i> It costs</h3>
+              <ul class="tight">
+                <li>Committed HTML makes bigger diffs</li>
+                <li>One new page rewrites the whole set</li>
+                <li>Checks only help if I run them</li>
+              </ul>
+            </div>
+          </div>
+          <div class="box box-navy">
+            <strong><i class="fas fa-lightbulb"></i> From the clean-up:</strong>
+            a disabled step can still be load-bearing. The template's deploy failed if a generated data file was missing, even though the step that generated it was switched off.
+          </div>
+        </section>
+        <section data-background-color="#f1f5f9">
+          <h2><i class="fas fa-forward"></i> Next Steps</h2>
+          <table class="compact">
+            <thead>
+              <tr>
+                <th>Next step</th>
+                <th>Why</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Link checker in the <code>build</code> job</td>
+                <td>Catch broken links in CI, not by memory</td>
+              </tr>
+              <tr>
+                <td><code>validate_pages.py</code> on pull requests</td>
+                <td>The same checks, enforced on every change</td>
+              </tr>
+              <tr>
+                <td>A walkthrough deck per project</td>
+                <td>A short visual version of every case study</td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="margin-top: 14px">
+            <a href="../../docs/portfolio-site/index.html" class="btn btn-sm"><i class="fas fa-book"></i> Read the case study</a>
+            <a href="../../projects/index.html" class="btn btn-sm"><i class="fas fa-briefcase"></i> All projects</a>
+            <a href="https://github.com/natsuichigo/mark" class="btn btn-sm"><i class="fas fa-code-branch"></i> View the repo</a>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+
+
+
+    <div class="deck-nav" aria-label="Presentation navigation">
+      <button type="button" class="deck-nav__button" id="prevButton">
+        <i class="fas fa-chevron-left"></i> Previous
+      </button>
+      <button type="button" class="deck-nav__button" id="homeButton">
+        <i class="fas fa-house"></i> Home
+      </button>
+      <span class="deck-nav__meta" id="deckNavMeta">Slide 1 of 9</span>
+      <button type="button" class="deck-nav__button" id="nextButton">
+        Next <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.js"></script>
+    <script>
+      Reveal.initialize({
+        hash: true,
+        slideNumber: false,
+        transition: "slide",
+        disableLayout: true,
+        controls: false,
+        progress: true,
+        center: false,
+      });
+
+      var prevButton = document.getElementById("prevButton");
+      var homeButton = document.getElementById("homeButton");
+      var nextButton = document.getElementById("nextButton");
+      var agendaCards = document.querySelectorAll(".agenda-card[data-slide-target]");
+      var lastAgendaContextIndex = null;
+
+      function updateAgendaState(horizontalIndex) {
+        var agendaReferenceIndex =
+          horizontalIndex === 1 ? lastAgendaContextIndex : horizontalIndex;
+
+        if (!agendaCards.length) { return; }
+
+        agendaCards.forEach(function (card) {
+          var start = parseInt(card.getAttribute("data-slide-start"), 10);
+          var end = parseInt(card.getAttribute("data-slide-end"), 10);
+          var isCurrent = false;
+
+          if (!Number.isNaN(start) && !Number.isNaN(end) && agendaReferenceIndex !== null) {
+            isCurrent = agendaReferenceIndex >= start && agendaReferenceIndex <= end;
+          }
+
+          card.classList.toggle("is-current", isCurrent);
+
+          if (isCurrent) {
+            card.setAttribute("aria-current", "true");
+          } else {
+            card.removeAttribute("aria-current");
+          }
+        });
+      }
+
+      function updateDeckNav() {
+        var indices = Reveal.getIndices();
+        var routes = Reveal.availableRoutes();
+        var horizontalIndex = indices && typeof indices.h === "number" ? indices.h : 0;
+        var totalSlides = Reveal.getTotalSlides();
+        var navMeta = document.getElementById("deckNavMeta");
+
+        if (navMeta) {
+          navMeta.textContent = "Slide " + (horizontalIndex + 1) + " of " + totalSlides;
+        }
+        if (prevButton) { prevButton.disabled = !(routes && routes.left); }
+        if (nextButton) { nextButton.disabled = !(routes && routes.right); }
+
+        updateAgendaState(horizontalIndex);
+      }
+
+      if (prevButton) {
+        prevButton.addEventListener("click", function () { Reveal.left(); });
+      }
+      if (homeButton) {
+        homeButton.addEventListener("click", function () { Reveal.slide(0); });
+      }
+      if (nextButton) {
+        nextButton.addEventListener("click", function () { Reveal.right(); });
+      }
+      if (agendaCards.length) {
+        agendaCards.forEach(function (card) {
+          card.addEventListener("click", function () {
+            var target = parseInt(card.getAttribute("data-slide-target"), 10);
+            if (!Number.isNaN(target)) { Reveal.slide(target); }
+          });
+        });
+      }
+
+      Reveal.on("slidechanged", function (e) {
+        if (e.currentSlide) {
+          e.currentSlide.scrollTop = 0;
+          e.currentSlide.scrollLeft = 0;
+        }
+        if (e.indexh > 1) { lastAgendaContextIndex = e.indexh; }
+        updateDeckNav();
+      });
+
+      Reveal.on("ready", function () {
+        var initialIndices = Reveal.getIndices();
+        if (initialIndices && typeof initialIndices.h === "number" && initialIndices.h > 1) {
+          lastAgendaContextIndex = initialIndices.h;
+        }
+        updateDeckNav();
+      });
+    </script>
+  </body>
+</html>

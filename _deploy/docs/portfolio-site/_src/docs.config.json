@@ -1,0 +1,35 @@
+{
+  "site_name": "This Portfolio Site",
+  "docidx_label": "Portfolio Site",
+  "css_file": "portfolio-site-docs.css",
+  "footer_name": "This Portfolio Site — Mark",
+  "typeset_prefix": "ps",
+  "depth": 2,
+  "nav": [
+    {
+      "slug": "overview.html",
+      "title": "Overview",
+      "section": "The Project"
+    },
+    {
+      "slug": "architecture.html",
+      "title": "Architecture",
+      "section": "The Project"
+    },
+    {
+      "slug": "how-deployment-works.html",
+      "title": "How Deployment Works",
+      "section": "How It Works"
+    },
+    {
+      "slug": "claude-skills.html",
+      "title": "The Claude Skills",
+      "section": "How It Works"
+    },
+    {
+      "slug": "lessons.html",
+      "title": "Lessons & Next Steps",
+      "section": "Reflections"
+    }
+  ]
+}

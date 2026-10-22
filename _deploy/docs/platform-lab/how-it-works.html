@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>How It Works — Platform Lab</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+    <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+    <link rel="prev" href="architecture.html">
+    <link rel="next" href="lessons.html">
+    <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+    <link rel="stylesheet" href="../theme.local.css">
+    <link rel="stylesheet" href="../../assets/platform-lab-docs.css">
+</head>
+<body dir="ltr">
+
+<input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+<label class="md-overlay" for="__drawer"></label>
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="./index.html" title="Platform Lab" class="md-header__button md-logo" aria-label="Platform Lab"></a>
+    <label class="md-header__button md-icon" for="__drawer" aria-label="Open navigation">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic"><span class="md-ellipsis">Platform Lab</span></div>
+        <div class="md-header__topic" data-md-component="header-topic"><span class="md-ellipsis">How It Works</span></div>
+      </div>
+    </div>
+  </nav>
+  <div class="hdr-page-nav" id="hdr-page-nav" aria-label="Page navigation"></div>
+  <script>(function(){function slugToTitle(h){var n=h.split("/").pop().replace(/\.html$/,"").replace(/-/g," ");return n.charAt(0).toUpperCase()+n.slice(1);}function buildNav(){var row=document.getElementById("hdr-page-nav");if(!row)return;var pE=document.querySelector("link[rel=prev]"),nE=document.querySelector("link[rel=next]"),pO=document.getElementById("pnav-prev"),nO=document.getElementById("pnav-next");var pH=pO?pO.dataset.href:(pE?pE.getAttribute("href"):null),pL=pO?pO.dataset.label:(pE?"&#9664; "+slugToTitle(pE.getAttribute("href")):null),nH=nO?nO.dataset.href:(nE?nE.getAttribute("href"):null),nL=nO?nO.dataset.label:(nE?slugToTitle(nE.getAttribute("href"))+" &#9654;":null);row.innerHTML=(pH?'<a class="hdr-page-nav__link hdr-page-nav__prev" href="'+pH+'">'+pL+'</a>':'<span class="hdr-page-nav__spacer"></span>')+'<div class="hdr-page-nav__centre"><a class="hdr-page-nav__link hdr-page-nav__hub" href="../../projects/index.html">Projects</a><a class="hdr-page-nav__link hdr-page-nav__docidx" href="./index.html">Platform Lab</a><a class="hdr-page-nav__link hdr-page-nav__portal" href="../../index.html">Home</a></div>'+(nH?'<a class="hdr-page-nav__link hdr-page-nav__next" href="'+nH+'">'+nL+'</a>':'<span class="hdr-page-nav__spacer"></span>');}if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",buildNav);}else{buildNav();}})()</script>
+</header>
+
+<div class="md-container">
+  <main class="md-main">
+    <div class="md-main__inner md-grid">
+
+      <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+        <div class="md-sidebar__scrollwrap"><div class="md-sidebar__inner">
+          <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+            <label class="md-nav__title" for="__drawer">
+              <a href="./index.html" class="md-nav__button md-logo" aria-label="Platform Lab"></a>
+              Platform Lab
+            </label>
+            <ul class="md-nav__list">
+              <li class="md-nav__item md-nav__section-label">The Project</li>
+              <li class="md-nav__item"><a href="./overview.html" class="md-nav__link">Overview</a></li>
+              <li class="md-nav__item"><a href="./architecture.html" class="md-nav__link">Architecture</a></li>
+              <li class="md-nav__item md-nav__section-label">Deep Dive</li>
+              <li class="md-nav__item"><a href="./how-it-works.html" class="md-nav__link md-nav__link--active">How It Works</a></li>
+              <li class="md-nav__item"><a href="./lessons.html" class="md-nav__link">Lessons &amp; Next Steps</a></li>
+            </ul>
+          </nav>
+        </div></div>
+      </div>
+
+      <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc">
+        <div class="md-sidebar__scrollwrap"><div class="md-sidebar__inner">
+          <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+            <label class="md-nav__title">On this page</label>
+            <ul class="md-nav__list" id="pd-toc"></ul>
+          </nav>
+        </div></div>
+      </div>
+
+      <div class="md-content" data-md-component="content">
+        <article class="md-content__inner md-typeset pl-typeset">
+
+        <h1 class="page-title">How It Works</h1>
+        <p class="page-sub">The Sprint 1 runbook: from a clean Fedora shell to an app served through ingress.</p>
+<div class="flow">
+<div class="flow-step"><div class="flow-num">1</div><div class="flow-text"><strong>Prepare WSL</strong><span>Enable systemd, confirm Podman reports cgroup v2</span></div></div>
+<div class="flow-arrow">↓</div>
+<div class="flow-step"><div class="flow-num">2</div><div class="flow-text"><strong>Create the cluster</strong><span><code>kind create cluster --config platform-lab.yaml</code> with <code>KIND_EXPERIMENTAL_PROVIDER=podman</code></span></div></div>
+<div class="flow-arrow">↓</div>
+<div class="flow-step"><div class="flow-num">3</div><div class="flow-text"><strong>Install Traefik</strong><span><code>helm upgrade --install traefik traefik/traefik --namespace traefik --create-namespace --wait</code></span></div></div>
+<div class="flow-arrow">↓</div>
+<div class="flow-step"><div class="flow-num">4</div><div class="flow-text"><strong>Install Metrics Server</strong><span>Upstream manifest, patched for kind's self-signed kubelet certificates</span></div></div>
+<div class="flow-arrow">↓</div>
+<div class="flow-step"><div class="flow-num">5</div><div class="flow-text"><strong>Deploy a sample app</strong><span><code>traefik/whoami</code> in a <code>sprint1</code> namespace, with a Service and an Ingress</span></div></div>
+<div class="flow-arrow">↓</div>
+<div class="flow-step"><div class="flow-num">6</div><div class="flow-text"><strong>Reach it locally</strong><span>Loopback port-forward to Traefik, then <code>http://whoami.platform-lab.localhost:8080/</code></span></div></div>
+</div>
+
+<h2 id="the-cluster-definition">The Cluster Definition</h2>
+<pre><code class="language-yaml">kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: platform-lab
+nodes:
+  - role: control-plane
+</code></pre>
+<h2 id="routing-an-app-through-ingress">Routing an App Through Ingress</h2>
+<pre><code class="language-bash">kubectl create namespace sprint1
+kubectl create deployment whoami --image=traefik/whoami --port=80 -n sprint1
+kubectl expose deployment whoami --port=80 --target-port=80 -n sprint1
+kubectl create ingress whoami --class=traefik \
+  --rule='whoami.platform-lab.localhost/*=whoami:80' -n sprint1
+</code></pre>
+<p>Names ending in <code>.localhost</code> resolve to loopback, so the app opens in a Windows
+browser through the WSL port-forward with no DNS record or hosts-file entry.</p>
+<div class="callout warn">
+<p><strong>Lab-only shortcuts are labelled as such.</strong> Metrics Server runs with <code>--kubelet-insecure-tls</code> because kind's kubelet certificates are not signed by a CA it trusts. That is acceptable for a disposable local cluster and is never carried into production. The port-forward stays bound to <code>127.0.0.1</code>, not <code>0.0.0.0</code>.</p>
+</div>
+
+<h2 id="practising-for-ckad">Practising for CKAD</h2>
+<p>The <code>sprint1</code> namespace doubles as a practice area: scaling, rollouts and rollbacks,
+probes, ConfigMaps and Secrets, resource requests and limits, scheduling and
+troubleshooting. Deleting and recreating the namespace resets it between exercises.</p>
+
+        </article>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="md-footer">
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">Platform Lab — Mark</div>
+    </div>
+  </div>
+</footer>
+
+</div>
+
+<script>
+(function(){
+  function buildToc(){
+    var toc=document.getElementById("pd-toc");
+    if(!toc)return;
+    var headings=document.querySelectorAll(".md-typeset h2");
+    if(!headings.length){
+      var sec=toc.closest(".md-sidebar--secondary");
+      if(sec)sec.style.display="none";
+      return;
+    }
+    var html="";
+    for(var i=0;i<headings.length;i++){
+      var h=headings[i];
+      if(!h.id)h.id="section-"+i;
+      html+='<li class="md-nav__item"><a class="md-nav__link" href="#'+h.id+'">'+h.textContent+'</a></li>';
+    }
+    toc.innerHTML=html;
+  }
+  function initScrollSpy(){
+    var links=document.querySelectorAll("#pd-toc .md-nav__link");
+    if(!links.length)return;
+    function onScroll(){
+      var hs=document.querySelectorAll(".md-typeset h2"),active=null;
+      var st=window.pageYOffset||document.documentElement.scrollTop||0;
+      for(var i=hs.length-1;i>=0;i--){if(hs[i].getBoundingClientRect().top+st-140<=st){active=hs[i].id;break;}}
+      for(var j=0;j<links.length;j++){links[j].className=active&&links[j].getAttribute("href")==="#"+active?"md-nav__link md-nav__link--active":"md-nav__link";}
+    }
+    window.addEventListener("scroll",onScroll,{passive:true});
+  }
+  if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",function(){buildToc();initScrollSpy();});}
+  else{buildToc();initScrollSpy();}
+})();
+</script>
+
+<button class="back-to-top" id="back-to-top" aria-label="Back to top" title="Back to top">&#8679;</button>
+<script>(function(){var b=document.getElementById("back-to-top");window.addEventListener("scroll",function(){b.classList.toggle("visible",window.scrollY>400);},{passive:true});b.addEventListener("click",function(){window.scrollTo({top:0,behavior:"smooth"});});})();</script>
+    <data id="pnav-prev" data-href="./architecture.html" data-label="&#9664; Architecture" hidden></data>
+    <data id="pnav-next" data-href="./lessons.html" data-label="Lessons &amp; Next Steps &#9654;" hidden></data>
+</body>
+</html>

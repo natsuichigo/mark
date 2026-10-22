@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 64" role="img" aria-label="Mark">
+  <!-- Monogram logo. White artwork, for the dark brand gradient.
+       Keep the file name: every page and deck reads assets/logo.svg. -->
+  <rect x="4" y="8" width="48" height="48" rx="12" fill="none" stroke="#ffffff" stroke-width="4"/>
+  <path d="M16 44 V20 L28 34 L40 20 V44" fill="none" stroke="#ffffff" stroke-width="4.5"
+        stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="66" y="42" font-family="Segoe UI, system-ui, -apple-system, sans-serif"
+        font-size="26" font-weight="700" fill="#ffffff" letter-spacing="0.5">Mark</text>
+</svg>

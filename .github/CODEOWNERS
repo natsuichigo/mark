@@ -1,0 +1,4 @@
+# Every PR touching these paths requests a review from the owner.
+/.github/ @natsuichigo
+/_deploy/ @natsuichigo
+/.claude/ @natsuichigo

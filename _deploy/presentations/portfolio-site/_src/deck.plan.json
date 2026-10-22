@@ -1,0 +1,142 @@
+{
+  "slug": "portfolio-site",
+  "title": "This Portfolio Site",
+  "subtitle": "Markdown in, GitHub Pages out, with no build step",
+  "deck_type": "deep-dive",
+  "audience": "Engineers: how the site is built, deployed and maintained",
+  "pills": ["Static HTML", "One workflow", "Zero secrets", "Claude Code skills"],
+  "docs_href": "../../docs/portfolio-site/index.html",
+  "docs_label": "Read the Case Study",
+  "agenda_intro": "From what the site is, through how it is built and deployed, to what I learned. Select any slide to jump to it.",
+  "phases": [
+    {
+      "title": "The Project",
+      "slides": [
+        {
+          "title": "What This Site Is",
+          "icon": "fa-circle-info",
+          "blocks": [
+            {"box": "navy", "icon": "fa-bullseye", "lead": "The one-sentence version:",
+             "text": "I commit HTML into <code>_deploy/</code> on <code>main</code>, and one GitHub Actions workflow uploads that folder to GitHub Pages exactly as it is."},
+            {"table": {"compact": true, "headers": ["URL", "What it is", "How it is made"],
+              "rows": [
+                ["<code>/</code>", "Home", "Written by hand"],
+                ["<code>/projects/</code>", "One card per case study", "Written by hand"],
+                ["<code>/docs/&lt;project&gt;/</code>", "A case study", {"text": "Generated from Markdown", "tone": "green"}],
+                ["<code>/walkthroughs/</code>", "One card per deck", "Written by hand"],
+                ["<code>/presentations/&lt;slug&gt;/</code>", "A reveal.js deck", {"text": "Generated from a deck plan", "tone": "green"}],
+                ["<code>/about/</code>", "Skills and contact", "Written by hand"]
+              ]}}
+          ]
+        },
+        {
+          "title": "Two Kinds of Page",
+          "icon": "fa-layer-group",
+          "blocks": [
+            {"panels": [
+              {"tone": "blue", "title": "Hub pages", "icon": "fa-hand",
+               "blocks": [
+                 {"list": ["Home, Projects, Walkthroughs, About, each case study's index",
+                           "Card grids styled by the shared <code>hub.css</code>",
+                           "Nav injected by <code>site-chrome.js</code> from a few <code>&lt;meta&gt;</code> tags",
+                           "Edited by hand"]}]},
+              {"tone": "green", "title": "Content pages", "icon": "fa-wand-magic-sparkles",
+               "blocks": [
+                 {"list": ["Every <code>docs/&lt;project&gt;/*.html</code> except the index",
+                           "MkDocs-Material layout: sidebar, contents, previous/next",
+                           "Written in Markdown in <code>_src/</code>",
+                           "Never edited by hand: the next build overwrites them"]}]}
+            ]},
+            {"box": "blue", "icon": "fa-palette", "lead": "One brand file.",
+             "text": "Every page and deck reads its colours from <code>assets/theme.css</code>."}
+          ]
+        }
+      ]
+    },
+    {
+      "title": "How It Works",
+      "slides": [
+        {
+          "title": "From Push to Live Page",
+          "icon": "fa-rocket",
+          "blocks": [
+            {"pre": "push to main ──► build job ─────────────────────► deploy job\n(_deploy/** or    checkout                         actions/deploy-pages\n the workflow)    configure-pages                  run summary with links\n                  upload _deploy/ as the artifact", "scale": "flow"},
+            {"cols": [
+              [{"list": ["<strong>Pull requests build, never publish</strong>: Pages has one live deployment per repo",
+                         "<strong>Path-gated</strong>: a README edit does not deploy",
+                         "<strong>Actions pinned to commit SHAs</strong>"]}],
+              [{"box": "green", "icon": "fa-lock", "lead": "Permissions:",
+                "text": "<code>contents: read</code>, <code>pages: write</code>, <code>id-token: write</code>. No secrets at all."}]
+            ]}
+          ]
+        },
+        {
+          "title": "Markdown In, Pages Out",
+          "icon": "fa-file-code",
+          "blocks": [
+            {"pre": "scaffold_project.py ──► _src/*.md + docs.config.json ──► build_project.py ──► validate_pages.py\n  index page, CSS          one file per page, nav order      every page rebuilt     links, sidebar, tags", "scale": "flow-sm"},
+            {"stats": [
+              {"value": "4", "label": "case studies", "tone": "navy"},
+              {"value": "17", "label": "generated pages", "tone": "blue"},
+              {"value": "1", "label": "workflow", "tone": "green"},
+              {"value": "0", "label": "secrets", "tone": "yellow"}
+            ]},
+            {"box": "yellow", "icon": "fa-triangle-exclamation", "lead": "The sidebar is baked into every page.",
+             "text": "Add or reorder one page and every page in the set changes, so the build always regenerates the whole set."}
+          ]
+        },
+        {
+          "title": "Decks Built From the Case Studies",
+          "icon": "fa-display",
+          "blocks": [
+            {"para": "The <code>docs-to-deck</code> skill reads a case study's pages and builds a reveal.js deck from a JSON plan. The first question is always who it is for:"},
+            {"table": {"compact": true, "headers": ["Deck type", "Audience", "Shape"],
+              "rows": [
+                ["<code>overview</code>", "Recruiters, hiring managers", "Short, outcome-first, little code"],
+                ["<code>deep-dive</code>", "Engineers, technical interviews", "Architecture, decisions, trade-offs"],
+                ["<code>talk</code>", "A meetup or team talk", "Story-led: problem to lessons"]
+              ]}},
+            {"box": "blue", "icon": "fa-camera", "lead": "Checked by rendering.",
+             "text": "<code>screenshot_deck.py</code> renders every slide in Playwright and measures overflow, because a slide that spills over still passes every structural check."}
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Reflections",
+      "slides": [
+        {
+          "title": "Trade-offs and Lessons",
+          "icon": "fa-scale-balanced",
+          "blocks": [
+            {"panels": [
+              {"tone": "green", "title": "No build step gives", "icon": "fa-check",
+               "blocks": [{"list": ["Deployment cannot break a page", "No generator or theme upgrades", "A one-job workflow with no secrets"]}]},
+              {"tone": "yellow", "title": "It costs", "icon": "fa-coins",
+               "blocks": [{"list": ["Committed HTML makes bigger diffs", "One new page rewrites the whole set", "Checks only help if I run them"]}]}
+            ]},
+            {"box": "navy", "icon": "fa-lightbulb", "lead": "From the clean-up:",
+             "text": "a disabled step can still be load-bearing. The template's deploy failed if a generated data file was missing, even though the step that generated it was switched off."}
+          ]
+        },
+        {
+          "title": "Next Steps",
+          "icon": "fa-forward",
+          "blocks": [
+            {"table": {"compact": true, "headers": ["Next step", "Why"],
+              "rows": [
+                ["Link checker in the <code>build</code> job", "Catch broken links in CI, not by memory"],
+                ["<code>validate_pages.py</code> on pull requests", "The same checks, enforced on every change"],
+                ["A walkthrough deck per project", "A short visual version of every case study"]
+              ]}},
+            {"buttons": [
+              {"label": "Read the case study", "href": "../../docs/portfolio-site/index.html", "icon": "fa-book"},
+              {"label": "All projects", "href": "../../projects/index.html", "icon": "fa-briefcase"},
+              {"label": "View the repo", "href": "https://github.com/natsuichigo/mark", "icon": "fa-code-branch"}
+            ]}
+          ]
+        }
+      ]
+    }
+  ]
+}

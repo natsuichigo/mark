@@ -1,0 +1,94 @@
+# Deploy GitHub Pages from the _deploy folder
+# ---
+# Publishes _deploy/ to GitHub Pages exactly as committed. There is no build
+# step: what is in _deploy/ is what visitors get.
+#
+# Triggers: push to main, pull request into main (build only), or manual.
+#
+# Pull requests only build. GitHub Pages has one live deployment per repo, so
+# deploying an unmerged PR would overwrite the live site.
+#
+# One-time setup:
+#   Repository Settings → Pages → Source: "GitHub Actions"
+
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - '_deploy/**'
+      - '.github/workflows/deploy-pages.yml'
+
+  pull_request:
+    branches:
+      - gh-pages
+    paths:
+      - '_deploy/**'
+      - '.github/workflows/deploy-pages.yml'
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One live deployment at a time. PR runs get their own group and cancel
+# superseded runs, so they never block the live deploy.
+concurrency:
+  group: pages-${{ github.event.pull_request.number || 'production' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+      - name: Setup Pages
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
+        with:
+          path: '_deploy'
+
+      - name: PR validation summary
+        if: github.event_name == 'pull_request'
+        run: |
+          {
+            echo "## 🔍 GitHub Pages build check"
+            echo ""
+            echo "✅ Site artifact built from \`_deploy\`. Not deployed: the site goes live when this PR merges into \`main\`."
+            echo ""
+            echo "Download the \`github-pages\` artifact from this run to inspect the built site."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128
+
+      - name: Deployment summary
+        if: always()
+        env:
+          URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          {
+            echo "## 🚀 Portfolio deployed"
+            echo ""
+            echo "- **Home:** ${URL}"
+            echo "- **Projects:** ${URL}projects/"
+            echo "- **Walkthroughs:** ${URL}walkthroughs/"
+            echo "- **About:** ${URL}about/"
+          } >> "$GITHUB_STEP_SUMMARY"
