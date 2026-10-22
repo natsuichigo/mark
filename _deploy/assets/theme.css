@@ -25,6 +25,11 @@
   --brand-accent-rgb:       79, 70, 229;
   --brand-accent-2-rgb:     14, 165, 233;
 
+  /* Small warm highlight used alongside the blues: tech chips,
+     the line under the hero, section dividers, card hover border */
+  --brand-highlight:      #f59e0b;
+  --brand-highlight-rgb:  245, 158, 11;
+
   /* Text and surfaces */
   --brand-heading:        #1e293b;
   --brand-text:           #0f172a;

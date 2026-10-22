@@ -4,6 +4,7 @@
   "css_file": "portfolio-site-docs.css",
   "footer_name": "This Portfolio Site — Mark",
   "typeset_prefix": "ps",
+  "brand": "github",
   "depth": 2,
   "nav": [
     {

@@ -98,6 +98,8 @@ def main():
     ap.add_argument("--site-name", help="Header/title text, e.g. 'My New Thing'")
     ap.add_argument("--docidx-label", help="Label for this project's index link in the page-nav bar")
     ap.add_argument("--footer-name", help="Footer copyright text")
+    ap.add_argument("--brand", help="Button colour: the project's main platform/tool, e.g. ansible, kubernetes, "
+                                    "terraform, aws (see project_colors.py --list-tools), or a hex colour")
     ap.add_argument("--prefix", help="CSS typeset prefix, e.g. 'mnt' -> .mnt-typeset (default: derived from --project)")
     ap.add_argument("--config-out", help="Where to write the starter docs.config.json (default: _deploy/docs/<project>/_src/docs.config.json)")
     ap.add_argument("--list", action="store_true", help="List existing projects available to use with --like, then exit")
@@ -130,6 +132,13 @@ def main():
 
     project = args.project
     prefix = args.prefix or derive_prefix(project)
+    if args.brand:
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        from project_colors import resolve_brand
+        try:
+            resolve_brand(args.brand)
+        except ValueError as e:
+            sys.exit(f"error: --brand: {e}")
 
     new_dir = deploy_root / "docs" / project
     new_css = deploy_root / "assets" / f"{project}-docs.css"
@@ -167,6 +176,7 @@ def main():
         "css_file": f"{project}-docs.css",
         "footer_name": args.footer_name,
         "typeset_prefix": prefix,
+        **({"brand": args.brand} if args.brand else {}),
         "depth": 2,
         "nav": [],
     }
@@ -182,6 +192,12 @@ def main():
     print(f"created {new_css} (prefix .{like_prefix}-typeset -> .{prefix}-typeset)")
     print(f"wrote {config_out} with an empty nav[] — put the Markdown beside it, add one nav[] entry per page,")
     print(f"  then: python3 build_project.py --project {project}")
+    if args.brand:
+        import subprocess
+        subprocess.run([sys.executable, str(Path(__file__).resolve().parent / "project_colors.py"),
+                        "--repo-root", str(repo_root), "--deploy-dir", args.deploy_dir])
+    else:
+        print("No --brand given: this project's buttons use the default blue. Add \"brand\" to the config later.")
     print("Still manual: add a card for this project to _deploy/projects/index.html (and the home page if featured)")
 
 

@@ -170,6 +170,7 @@ mark/
     ├── assets/
     │   ├── theme.css              # THE BRAND: --brand-* colours for every page
     │   ├── hub.css                # layout for the hand-written hub pages
+    │   ├── project-colors.css     # GENERATED: per-project button colours (project_colors.py)
     │   ├── logo.svg / logo-dark.svg
     │   ├── site-chrome.css / .js  # the Home · Projects · Walkthroughs · About nav
     │   └── <project>-docs.css     # per-project content component CSS
@@ -237,6 +238,33 @@ HTML inside the Markdown; Python-Markdown passes raw HTML blocks through.
 
 The existing case studies show each one in use; copy from them.
 
+## Project button colour
+
+Each case study's buttons and icon badge take the brand colour of the main
+platform or application the project is built on, e.g. Ansible → Red Hat red,
+Kubernetes → Kubernetes blue, Packer → Packer blue. Set it with a `"brand"` key
+in the project's `_src/docs.config.json`:
+
+```json
+"brand": "ansible"      // a known tool name
+"brand": "#7b42bc"      // or any hex colour
+```
+
+- **Pick the tool the project is mainly *about*,** not every tool it uses
+  (a Packer pipeline that runs Ansible is `packer`). If it is unclear, ask the
+  user. `project_colors.py --list-tools` lists the known names.
+- `build_project.py` regenerates `_deploy/assets/project-colors.css` after
+  every build, so changing the brand is: edit the config → build → validate.
+  Never edit `project-colors.css` by hand.
+- Colours are darkened automatically, keeping the hue, until white button text
+  is readable (4.5:1).
+- Where it applies: cards on Home and Projects that link to `docs/<project>/`
+  (matched by link, no class needed), and the project's own hub page through
+  `<body data-project="<project>">`. Amber `.btn.alt` buttons (walkthrough
+  slides) stay amber. A project without a brand uses the default blue.
+- `validate_pages.py` checks the chain: a known brand, an up-to-date
+  `project-colors.css`, `hub.css` importing it, and `data-project` on the hub.
+
 ## Workflow
 
 ### 0. Which project does this page belong to?
@@ -283,15 +311,20 @@ missing.
      --project my-project --like portfolio-site \
      --site-name "My Project" \
      --docidx-label "My Project" \
-     --footer-name "My Project — Mark"
+     --footer-name "My Project — Mark" \
+     --brand terraform
    ```
-   This writes:
+   `--brand` is the project's main platform/tool (see "Project button
+   colour"); ask the user if it is not obvious. This writes:
    - `_deploy/docs/<project>/index.html`: cloned from `--like`, retitled, with
      an empty card grid and the repo/slides buttons commented out.
    - `_deploy/assets/<project>-docs.css`: cloned CSS with the
      `.{prefix}-typeset` class re-targeted (prefix derived from the slug, or
      `--prefix`).
-   - `_deploy/docs/<project>/_src/docs.config.json`: an empty `nav[]`.
+   - `_deploy/docs/<project>/_src/docs.config.json`: an empty `nav[]`, plus
+     `"brand"` when given.
+   - `_deploy/assets/project-colors.css`: regenerated with the new colour.
+   The cloned `index.html` keeps `<body data-project="<project>">`.
 3. Fill in the config's `nav[]` with the four case-study pages (see "The
    case-study page set") and write the four Markdown files in `_src/`.
 4. Build and validate the set (Workflow A steps 3 and 5).
@@ -422,6 +455,7 @@ Auto-installs `pymupdf`/`pymupdf4llm` on first run.
 
 `scripts/build_project.py`: regenerates EVERY page in a set from `_src/`.
 - Converts `_src/<slug>.md` → `<slug>.html` for each `nav[]` entry.
+- Then regenerates `project-colors.css` from every config's `"brand"`.
 - **Refuses to build a partial set**: a nav entry with no source is reported and
   nothing is written. Orphan sources not in `nav[]` are reported too.
 - Flags: `--repo-root`, `--deploy-dir`, `--project`, `--src-dir` (default
@@ -432,7 +466,8 @@ these pages.
 - Sidebar agreement across pages, exactly one active link, an unbroken
   prev/next chain, internal links and relative assets resolving, unrendered
   Markdown tables and code spans, placeholder tags the browser eats, tag
-  balance, and `_src/` source coverage.
+  balance, `_src/` source coverage, and the project button colour (brand
+  known, `project-colors.css` current, `data-project` on the hub).
 - **Two severities.** With `_src/docs.config.json` present, structural findings
   are FAILURES; without one, WARNINGS. Broken links, unresolvable assets,
   unrendered Markdown and unbalanced tags always fail.
@@ -443,10 +478,18 @@ these pages.
 existing one's CSS and `index.html`, plus a starter config.
 - Flags: `--repo-root`, `--deploy-dir` (default `_deploy`), `--project`,
   `--like`, `--site-name`, `--docidx-label`, `--footer-name`, `--prefix`,
-  `--config-out`, `--list`, `--force`.
+  `--config-out`, `--brand`, `--list`, `--force`.
 - An **empty** target folder is accepted without `--force`. Real files require
   `--force`, which overwrites `index.html` and the CSS but never touches
   generated pages or `_src/`.
+
+`scripts/project_colors.py`: generates `_deploy/assets/project-colors.css`
+from each config's `"brand"` key (see "Project button colour").
+- A known tool name (`ansible`, `kubernetes`, `packer`, `terraform`, `aws`,
+  `docker`, `github`, …) or a hex colour; darkened for readable white text.
+- Run automatically by `build_project.py` and `scaffold_project.py --brand`.
+- Flags: `--repo-root`, `--deploy-dir`, `--check` (exit 1 if out of date),
+  `--list-tools`.
 
 `scripts/extract_config.py`: rebuilds a `docs.config.json` from a deployed
 page (title, CSS file, typeset prefix, index label, footer, depth and the nav

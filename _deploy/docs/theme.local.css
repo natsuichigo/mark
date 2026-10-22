@@ -19,7 +19,7 @@
   --md-default-bg-color: #0f172a;
   --md-default-fg-color: rgba(226, 232, 240, 0.92);
   --md-default-fg-color--light: rgba(226, 232, 240, 0.7);
-  --md-typeset-a-color: #7dd3fc;
+  --md-typeset-a-color: #fcd34d;
 }
 
 .md-header {
@@ -256,7 +256,7 @@
 }
 
 /* Pygments syntax token colours for dark code blocks */
-.md-typeset .highlight .gh  { color: #7dd3fc; font-weight: bold; }  /* heading */
+.md-typeset .highlight .gh  { color: #fcd34d; font-weight: bold; }  /* heading */
 .md-typeset .highlight .gu  { color: #94a3b8; font-weight: bold; }  /* sub-heading */
 .md-typeset .highlight .gs  { color: #e2e8f0; font-weight: bold; }  /* bold */
 .md-typeset .highlight .ge  { color: #cbd5e1; font-style: italic; } /* italic */

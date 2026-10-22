@@ -293,6 +293,38 @@ def validate_project(project_dir: Path, deploy_root: Path, rep: Report) -> None:
         detail = "; ".join(parser.errors[:2]) or f"unclosed at EOF: {parser.stack[:5]}"
         rep.check(not parser.errors and not parser.stack, f"{name}: tags balanced", detail)
 
+    # ── Project colour ───────────────────────────────────────────────────────
+    # The button colour comes from the config's "brand" key via the generated
+    # assets/project-colors.css, and reaches the hub page through
+    # <body data-project="<project>">. Any break in that chain silently falls
+    # back to the default blue, so check each link of it.
+    rep.section("Project colour")
+    brand = (config or {}).get("brand")
+    if not brand:
+        rep.warn(f"{project}: no \"brand\" in docs.config.json — buttons use the default blue")
+    else:
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        import project_colors
+        try:
+            project_colors.resolve_brand(brand)
+            known = True
+        except ValueError as e:
+            known = False
+            rep.fail(f"{project}: {e}")
+        if known:
+            css_path = deploy_root / project_colors.OUT_REL
+            css = css_path.read_text(encoding="utf-8") if css_path.is_file() else ""
+            rep.check(project_colors.project_block(project, brand) in css,
+                      f"project-colors.css has the current colour for '{brand}'",
+                      "missing or stale — run project_colors.py (build_project.py does this)")
+            hub_css = deploy_root / "assets" / "hub.css"
+            rep.check(hub_css.is_file() and "project-colors.css" in hub_css.read_text(encoding="utf-8"),
+                      "hub.css imports project-colors.css", "add @import url(\"project-colors.css\")")
+        if "index.html" in pages:
+            rep.check(f'data-project="{project}"' in pages["index.html"],
+                      f'index.html <body> has data-project="{project}"',
+                      "the hub page's buttons will stay the default blue")
+
     # ── Source coverage ──────────────────────────────────────────────────────
     # Not a failure: most legacy sets predate the _src/ convention. But an
     # uncovered page is one that can only be edited by hand-patching HTML, so

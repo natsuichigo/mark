@@ -4,6 +4,7 @@
   "css_file": "platform-lab-docs.css",
   "footer_name": "Platform Lab — Mark",
   "typeset_prefix": "pl",
+  "brand": "kubernetes",
   "depth": 2,
   "nav": [
     {"slug": "overview.html", "title": "Overview", "section": "The Project"},

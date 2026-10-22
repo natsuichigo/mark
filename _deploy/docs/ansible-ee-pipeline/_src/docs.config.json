@@ -4,6 +4,7 @@
   "css_file": "ansible-ee-pipeline-docs.css",
   "footer_name": "Ansible EE Pipeline — Mark",
   "typeset_prefix": "aep",
+  "brand": "ansible",
   "depth": 2,
   "nav": [
     {"slug": "overview.html", "title": "Overview", "section": "The Project"},

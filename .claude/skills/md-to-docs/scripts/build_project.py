@@ -120,6 +120,18 @@ def main():
     if failed:
         print("  BUILD FAILED")
         return 1
+
+    # Button colours come from the config's "brand" key; keep the generated
+    # CSS in step with it so a brand change needs no separate command.
+    print("\n  Project button colours:")
+    result = subprocess.run(
+        [sys.executable, str(SCRIPT_DIR / "project_colors.py"),
+         "--repo-root", args.repo_root, "--deploy-dir", args.deploy_dir],
+        capture_output=True, text=True)
+    print((result.stdout or result.stderr).rstrip())
+    if result.returncode != 0:
+        print("  BUILD FAILED (project colours)")
+        return 1
     print("\n  Next: validate the result with")
     print(f"    python3 {SCRIPT_DIR.name}/validate_pages.py --project {args.project}")
     print("  And remember the hub page is hand-authored — if you added or removed a")

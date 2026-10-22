@@ -4,6 +4,7 @@
   "css_file": "packer-image-pipeline-docs.css",
   "footer_name": "Packer Golden Image Pipeline — Mark",
   "typeset_prefix": "pip",
+  "brand": "packer",
   "depth": 2,
   "nav": [
     {"slug": "overview.html", "title": "Overview", "section": "The Project"},
