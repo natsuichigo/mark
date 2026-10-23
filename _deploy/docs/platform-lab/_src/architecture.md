@@ -56,27 +56,29 @@ runner pods never need privileged mode.
 
 ## Reaching the UIs
 
-Every UI is an Ingress on Traefik at `<name>.platform-lab.localhost:8080`. kind has no
+Every UI is an Ingress on Traefik at `<name>.platform-lab.localhost`. kind has no
 cloud load balancer, so Traefik's Service is a `NodePort` fixed at 30080. The kind
-cluster definition maps `127.0.0.1:8080` on the laptop to that port, so the UIs are up
+cluster definition maps `127.0.0.1:80` on the laptop to that port, so the UIs are up
 whenever the cluster is, with no port-forward to keep running. Names ending in
 `.localhost` resolve to loopback, and the mapping listens on loopback only, so nothing
 is reachable from the network.
 
 <pre class="dir-tree">
-browser ─► 127.0.0.1:8080 ─► kind node :30080 ─► Traefik ─► Ingress host ─► Service
+browser ─► 127.0.0.1:80 ─► kind node :30080 ─► Traefik ─► Ingress host ─► Service
            <span class="cm"># kind extraPortMappings      # NodePort            # argocd, headlamp, grafana, ...</span>
 </pre>
 
 **Headlamp** is the cluster UI: workloads, logs, events, a shell into pods and YAML
-editing. Every sign-in needs a short-lived ServiceAccount token
-(`kubectl create token`), so being able to reach the page grants nothing.
+editing. It has no login: it acts as its own `cluster-admin` ServiceAccount, so access
+is decided by who can reach it. A Traefik IP allow-list admits only requests that came in
+through the laptop's port mapping, and a NetworkPolicy lets only Traefik connect to the
+pod. Both were tested from a pod: `403` through Traefik, a timeout when called directly.
 
 ## Where Images Live
 
 | Kind | Built where | Stored where |
 |---|---|---|
-| Ansible EEs for AWX | GitHub-hosted runners, or locally with Podman | The lab registry (zot), at `registry.platform-lab.localhost:8080/<name>:<tag>` |
+| Ansible EEs for AWX | GitHub-hosted runners, or locally with Podman | The lab registry (zot), at `registry.platform-lab.localhost/<name>:<tag>` |
 | VM images | In WSL with Packer's `qemu` builder on KVM; tested with Vagrant | qcow2 files and Vagrant boxes on the laptop |
 | vSphere templates | The Packer pipeline, on the lab's runners | The vSphere content library |
 

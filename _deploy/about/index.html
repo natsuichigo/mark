@@ -34,62 +34,99 @@
         <section class="hero" aria-label="Page header">
             <img class="brand-logo" src="../assets/logo.svg" alt="Mark">
             <h1>About me</h1>
-            <p class="role">DevOps &amp; Platform Engineer</p>
+            <p class="role">Systems Engineer II &middot; DevOps &amp; Platform Engineer</p>
         </section>
 
         <section class="intro" aria-labelledby="bio">
             <h2 id="bio">Who I am</h2>
             <p>I work on the automation underneath infrastructure: the image pipelines, configuration
                management and CI/CD that let a team build a server or a platform the same way every time.</p>
-            <!-- TODO: two or three sentences in your own words: current role, the kind of
-                 environments you have worked in, and what you are looking for next. -->
-            <p class="todo">TODO: add your current role, background and what you're looking for next.</p>
+            <p>I have more than 10 years in enterprise IT, most of it in regulated financial services.
+               Until September 2026 I was a Systems Engineer II and the Ansible Automation Platform Tech Lead at Capitec Bank,
+               working on automation, server and storage engineering, observability and virtualisation
+               across AWS and on-prem VMware.</p>
+            <p>I build CI/CD pipelines and Ansible-driven workflows, mentor other engineers, and I'm moving
+               further into DevOps and platform engineering.</p>
         </section>
 
         <div class="section-label"><span>Skills</span></div>
-        <!-- Taken from the tools used across the projects on this site. Trim or extend to match your CV. -->
         <section class="skill-grid" aria-label="Skills">
             <div class="skill-group">
                 <h3>Images &amp; infrastructure as code</h3>
-                <ul class="chips left"><li>Packer</li><li>Terraform</li><li>HCL</li><li>Kickstart</li><li>Autounattend</li></ul>
+                <ul class="chips left"><li>Terraform</li><li>Packer</li><li>HCL</li><li>HPE Morpheus</li><li>Kickstart</li><li>Autounattend</li></ul>
             </div>
             <div class="skill-group">
                 <h3>Configuration management</h3>
-                <ul class="chips left"><li>Ansible</li><li>ansible-builder</li><li>AAP / AWX</li><li>CIS hardening</li></ul>
+                <ul class="chips left"><li>Ansible</li><li>Ansible Automation Platform</li><li>AWX</li><li>Playbooks &amp; workflows</li><li>ansible-builder</li><li>CIS hardening</li></ul>
             </div>
             <div class="skill-group">
                 <h3>Containers &amp; Kubernetes</h3>
-                <ul class="chips left"><li>Podman</li><li>Docker</li><li>Kubernetes</li><li>kind</li><li>Helm</li><li>Traefik</li></ul>
+                <ul class="chips left"><li>OpenShift</li><li>Kubernetes</li><li>Podman</li><li>Docker</li><li>kind</li><li>Helm</li><li>Traefik</li></ul>
             </div>
             <div class="skill-group">
                 <h3>CI/CD</h3>
-                <ul class="chips left"><li>GitHub Actions</li><li>Composite actions</li><li>OIDC to AWS</li><li>Approval gates</li></ul>
+                <ul class="chips left"><li>Git</li><li>GitHub Actions</li><li>Composite actions</li><li>OIDC to AWS</li><li>Approval gates</li><li>GitHub Pages</li></ul>
             </div>
             <div class="skill-group">
                 <h3>Platforms &amp; OS</h3>
-                <ul class="chips left"><li>AWS</li><li>VMware vSphere</li><li>RHEL</li><li>Amazon Linux</li><li>Windows Server</li><li>Fedora</li></ul>
+                <ul class="chips left"><li>AWS (EC2)</li><li>VMware vSphere</li><li>Linux</li><li>RHEL</li><li>Amazon Linux</li><li>Windows Server</li><li>Fedora</li></ul>
             </div>
             <div class="skill-group">
                 <h3>Languages</h3>
-                <ul class="chips left"><li>Python</li><li>Bash</li><li>PowerShell</li><li>Go</li><li>YAML</li></ul>
+                <ul class="chips left"><li>Python</li><li>Bash</li><li>PowerShell</li><li>Go</li><li>YAML</li><li>JavaScript</li><li>HTML &amp; CSS</li><li>PHP</li><li>Java</li></ul>
+            </div>
+            <div class="skill-group">
+                <h3>Operations &amp; leadership</h3>
+                <ul class="chips left"><li>Observability dashboards</li><li>Log analysis</li><li>L2 escalation</li><li>Root cause analysis</li><li>Mentoring</li><li>Vendor engagement</li><li>Power BI</li></ul>
             </div>
         </section>
 
         <div class="section-label"><span>Certifications</span></div>
         <section class="intro" aria-label="Certifications">
-            <!-- From the Platform Lab objectives. Move items to "Achieved" as you pass them. -->
+            <p><strong>Achieved:</strong></p>
+            <ul class="chips left"><li>GitHub Foundations</li><li>GitHub Actions</li><li>Linux Essentials</li><li>CompTIA A+</li><li>CompTIA Network+</li><li>MCDST</li></ul>
             <p><strong>Working towards:</strong> Certified Kubernetes Application Developer (CKAD),
                Certified Kubernetes Administrator (CKA), AWS Certified Associate.</p>
-            <p class="todo">TODO: list certifications you already hold.</p>
         </section>
 
         <div class="section-label"><span>Experience</span></div>
         <section class="intro" aria-label="Experience">
-            <p class="todo">TODO: your roles, most recent first, with one line on what you did in each.</p>
-            <!-- Suggested shape:
-            <h2>Job title · Company</h2>
-            <p>2024 – now · One sentence on what you owned and the result.</p>
-            -->
+            <h2>Systems Engineer II &middot; Capitec Bank</h2>
+            <p class="dates">Feb 2022 – Sep 2026</p>
+            <ul>
+                <li>Led Ansible Automation Platform: playbooks, workflows, standards, documentation and AAP environment configuration.</li>
+                <li>Designed and maintained infrastructure as code for AWS (Terraform, AAP) and on-prem VMware (AAP).</li>
+                <li>Built CI/CD pipelines that create, test and promote Packer golden images for VMware and AWS, with CIS hardening applied by Ansible (Windows, RHEL, Amazon Linux 2023).</li>
+                <li>Built CI/CD pipelines that produce Ansible Execution Environment images for each environment.</li>
+                <li>Deployed a small OpenShift cluster to run Ansible Automation Platform during a proof of concept.</li>
+                <li>Automated day-2 operations for the Infrastructure Operations team; managed AWS EC2 and VMware environments.</li>
+                <li>Built observability dashboards and analysed logs to find issues early; acted as L2 escalation point and mentored junior engineers.</li>
+            </ul>
+
+            <h2>Team Leader, Agent Support Specialist &middot; Capitec Bank</h2>
+            <p class="dates">Jan 2016 – Feb 2022</p>
+            <ul>
+                <li>Managed the hardware support team for branch IT, including vendor coordination and performance management.</li>
+                <li>Improved device life-cycle and escalation processes; provided technical escalation support.</li>
+                <li>Built reports and dashboards in Power BI and Excel.</li>
+            </ul>
+
+            <h2>Earlier</h2>
+            <p>Data Specialist, Debut Consulting / Vodacom Repairs (2014 – 2016) &middot; Sales Consultant, Vodacom (2013 – 2014)</p>
+        </section>
+
+        <div class="section-label"><span>Education</span></div>
+        <section class="intro" aria-label="Education">
+            <ul>
+                <li>Diploma in Systems Development, Boston City Campus (2023)</li>
+                <li>FET Certificate: Banking, BANK SETA (2019)</li>
+                <li>PC Technician Certificate, IT Business Campus (2012)</li>
+            </ul>
+        </section>
+
+        <div class="section-label"><span>Languages</span></div>
+        <section class="intro" aria-label="Languages">
+            <p>English (fluent) &middot; Afrikaans (proficient)</p>
         </section>
 
         <div class="section-label"><span>Social Media Profiles</span></div>

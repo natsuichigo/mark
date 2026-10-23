@@ -49,8 +49,8 @@ study on is the platform itself.
 | Workstation | Fedora 44 on WSL 2, VS Code, Podman | — |
 | Cluster | kind (single node), kubectl, Helm, k9s | — |
 | Delivery | Argo CD app-of-apps from Git | Sealed Secrets |
-| Ingress | Traefik on `*.platform-lab.localhost:8080`, published by kind on loopback | cert-manager, Gateway API |
-| Cluster UI | Headlamp, token sign-in | — |
+| Ingress | Traefik on `*.platform-lab.localhost`, published by kind on loopback | cert-manager, Gateway API |
+| Cluster UI | Headlamp, no login, reachable only from the laptop | — |
 | Registry | zot in the cluster, one image name from WSL and from pods | Authentication |
 | VM images | Packer `qemu` on KVM inside WSL, Vagrant + libvirt | The Packer pipeline's RHEL and Windows builds on `qemu` |
 | CI | GitHub Actions runners in the cluster (ARC), one scale set per repo | More repos, more in-cluster jobs |

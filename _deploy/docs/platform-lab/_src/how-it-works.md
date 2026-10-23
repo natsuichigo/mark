@@ -84,7 +84,7 @@ a route. The Argo CD chart creates an Ingress for `argocd.platform-lab.localhost
 before any ingress controller exists. When Traefik arrives, it watches the API for
 Ingresses with its class and picks that one up. Until then, the UI is reached with a
 temporary port-forward to `argocd-server`. Once Traefik is up, that port-forward is
-never needed again: the cluster itself publishes Traefik on `127.0.0.1:8080`. Declare what you want, and a controller acts
+never needed again: the cluster itself publishes Traefik on `127.0.0.1:80`. Declare what you want, and a controller acts
 on it whenever it's running: that's the pattern behind all of Kubernetes.
 
 ## No Port-Forward: the Cluster Publishes Traefik
@@ -98,7 +98,7 @@ nodes:
   - role: control-plane
     extraPortMappings:
       - containerPort: 30080      # Traefik's NodePort
-        hostPort: 8080
+        hostPort: 80
         listenAddress: 127.0.0.1  # loopback only: the routes are plain HTTP
 ```
 
@@ -126,10 +126,10 @@ The lab registry was proven end to end with one image: pushed from WSL through T
 then started as a pod from the same name.
 
 ```bash
-podman push registry.platform-lab.localhost:8080/test/busybox:1.37
+podman push registry.platform-lab.localhost/test/busybox:1.37
 kubectl run regtest -n playground --restart=Never \
-  --image=registry.platform-lab.localhost:8080/test/busybox:1.37 -- echo pulled-from-lab-registry
-# Successfully pulled image "registry.platform-lab.localhost:8080/test/busybox:1.37" in 236ms
+  --image=registry.platform-lab.localhost/test/busybox:1.37 -- echo pulled-from-lab-registry
+# Successfully pulled image "registry.platform-lab.localhost/test/busybox:1.37" in 236ms
 ```
 
 Execution Environments follow the same path. One script handles both sources: an image
@@ -170,7 +170,7 @@ The order matters. Runner pods are made non-root first, and the API server's
 starts enforcing.
 
 <div class="callout warn">
-<p><strong>Lab-only shortcuts are labelled as such.</strong> Metrics Server skips kubelet TLS verification because kind's kubelet certificates are self-signed. Argo CD serves plain HTTP behind Traefik. All UIs are reached through a kind port mapping bound to <code>127.0.0.1</code>, so nothing is exposed beyond the machine. Headlamp's ServiceAccount is <code>cluster-admin</code>, but it only acts for a browser that signs in with a short-lived token.</p>
+<p><strong>Lab-only shortcuts are labelled as such.</strong> Metrics Server skips kubelet TLS verification because kind's kubelet certificates are self-signed. Argo CD serves plain HTTP behind Traefik. All UIs are reached through a kind port mapping bound to <code>127.0.0.1</code>, so nothing is exposed beyond the machine. Headlamp has no login and acts as a <code>cluster-admin</code> ServiceAccount, so it is locked to the laptop's browser by a Traefik IP allow-list and a NetworkPolicy.</p>
 </div>
 
 ## Practising for CKAD and CKA

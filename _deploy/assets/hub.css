@@ -99,6 +99,16 @@ a { color: var(--brand-accent); }
     line-height: 1.6;
 }
 .intro p:last-child { margin-bottom: 0; }
+.intro ul:not(.chips) {
+    margin: 0 0 16px;
+    padding-left: 20px;
+    color: var(--brand-text-sub);
+    line-height: 1.6;
+}
+.intro ul:not(.chips):last-child { margin-bottom: 0; }
+.intro p.dates { margin-bottom: 6px; font-size: 0.92rem; }
+.intro ul + h2 { margin-top: 18px; }
+.intro .chips { margin: 0 0 12px; }
 
 .section-label {
     display: flex;

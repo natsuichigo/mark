@@ -30,8 +30,10 @@ Decisions, the problems hit along the way, and the roadmap.
   the cluster definition, so the UIs survive reboots with nothing left running in a
   terminal.
 - **Headlamp as the cluster UI.** The Kubernetes Dashboard project has been retired and
-  points to Headlamp. It's light enough for the core (under 200 MB), and token sign-in
-  means reaching the page grants nothing. Argo CD's self-heal undoes edits made in the
+  points to Headlamp. It's light enough for the core (under 200 MB). I started with
+  token sign-in, then switched to no login at all, which made access the real control:
+  only the laptop's browser can reach it, enforced twice (an IP allow-list in Traefik and
+  a NetworkPolicy) and tested from inside the cluster. Argo CD's self-heal undoes edits made in the
   UI to anything it manages, so lasting changes still go through Git.
 - **One runner scale set per repo.** A personal GitHub account can't share runners
   across repos the way an organization can. Each repo that uses the lab gets its own

@@ -158,20 +158,22 @@ The <a href="../packer-image-pipeline/index.html">Packer pipeline</a> has its ow
 something in the lab (the cluster, or vSphere for Packer) run on my runners</strong>, so
 runner pods never need privileged mode.</p>
 <h2 id="reaching-the-uis">Reaching the UIs</h2>
-<p>Every UI is an Ingress on Traefik at <code>&lt;name&gt;.platform-lab.localhost:8080</code>. kind has no
+<p>Every UI is an Ingress on Traefik at <code>&lt;name&gt;.platform-lab.localhost</code>. kind has no
 cloud load balancer, so Traefik's Service is a <code>NodePort</code> fixed at 30080. The kind
-cluster definition maps <code>127.0.0.1:8080</code> on the laptop to that port, so the UIs are up
+cluster definition maps <code>127.0.0.1:80</code> on the laptop to that port, so the UIs are up
 whenever the cluster is, with no port-forward to keep running. Names ending in
 <code>.localhost</code> resolve to loopback, and the mapping listens on loopback only, so nothing
 is reachable from the network.</p>
 <pre class="dir-tree">
-browser ─► 127.0.0.1:8080 ─► kind node :30080 ─► Traefik ─► Ingress host ─► Service
+browser ─► 127.0.0.1:80 ─► kind node :30080 ─► Traefik ─► Ingress host ─► Service
            <span class="cm"># kind extraPortMappings      # NodePort            # argocd, headlamp, grafana, ...</span>
 </pre>
 
 <p><strong>Headlamp</strong> is the cluster UI: workloads, logs, events, a shell into pods and YAML
-editing. Every sign-in needs a short-lived ServiceAccount token
-(<code>kubectl create token</code>), so being able to reach the page grants nothing.</p>
+editing. It has no login: it acts as its own <code>cluster-admin</code> ServiceAccount, so access
+is decided by who can reach it. A Traefik IP allow-list admits only requests that came in
+through the laptop's port mapping, and a NetworkPolicy lets only Traefik connect to the
+pod. Both were tested from a pod: <code>403</code> through Traefik, a timeout when called directly.</p>
 <h2 id="where-images-live">Where Images Live</h2>
 <table>
 <thead>
@@ -185,7 +187,7 @@ editing. Every sign-in needs a short-lived ServiceAccount token
 <tr>
 <td>Ansible EEs for AWX</td>
 <td>GitHub-hosted runners, or locally with Podman</td>
-<td>The lab registry (zot), at <code>registry.platform-lab.localhost:8080/&lt;name&gt;:&lt;tag&gt;</code></td>
+<td>The lab registry (zot), at <code>registry.platform-lab.localhost/&lt;name&gt;:&lt;tag&gt;</code></td>
 </tr>
 <tr>
 <td>VM images</td>
