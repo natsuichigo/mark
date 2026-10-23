@@ -18,7 +18,7 @@
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Mark — DevOps &amp; Platform Engineer">
     <meta property="og:title" content="Overview — Platform Lab">
-    <meta property="og:description" content="A home platform built sprint by sprint and run like production. Work in progress.">
+    <meta property="og:description" content="A full platform stack on an 8 GB laptop, deployed from Git by Argo CD. Work in progress.">
     <meta property="og:url" content="https://natsuichigo.github.io/mark/docs/platform-lab/overview.html">
     <meta property="og:image" content="https://natsuichigo.github.io/mark/assets/og-image.png">
     <meta property="og:image:width" content="1200">
@@ -85,31 +85,46 @@
         <article class="md-content__inner md-typeset pl-typeset">
 
         <h1 class="page-title">Overview</h1>
-        <p class="page-sub">A home platform built sprint by sprint and run like production. Work in progress.</p>
-<p>Platform Lab is one repository for building a reusable home platform: a local
-Kubernetes platform, the automation around it, and eventually Terraform-managed
-infrastructure and an image factory. It is also how I practise for the
-Kubernetes certifications, so each sprint ends with something running that I can
-work against.</p>
+        <p class="page-sub">A full platform stack on an 8 GB laptop, deployed from Git by Argo CD. Work in progress.</p>
+<p>Platform Lab is one repository for a real home platform: a Kubernetes cluster that
+<strong>Argo CD deploys entirely from Git</strong>, with GitHub Actions runners inside the cluster.
+The challenge is to run the tools a platform team actually uses (GitOps, ingress,
+CI runners, a container registry, Prometheus and Grafana, AWX, Backstage, and a KVM
+hypervisor for VM images) on one 8 GB laptop, with no cloud bill. It is also how I practise for the Kubernetes certifications: the cluster I
+study on is the platform itself.</p>
 <div class="callout">
-<p><strong>Status: in progress.</strong> Sprint 0 (workstation and repository) is done. Sprint 1, the first Kubernetes platform, is underway. Later sprints are on the <a href="./lessons.html">roadmap</a>.</p>
+<p><strong>Status: in progress.</strong> The kind cluster and Argo CD are running and syncing from GitHub through a GitHub App, after a DNS search-domain clash that broke TLS to GitHub was found and fixed. The core platform (Traefik, Metrics Server, RBAC and the Headlamp cluster UI) deploys from Git, and every UI opens with no port-forward. In-cluster runners for this repo and the Packer pipeline are next, then hardening. See the <a href="./lessons.html">roadmap and problems log</a>.</p>
 </div>
 
 <h2 id="principles">Principles</h2>
 <ul>
-<li><strong>One product.</strong> Everything belongs in the <code>platform-lab</code> repository, so the work
-  doesn't fragment across many small repos.</li>
-<li><strong>Every commit contributes to the platform.</strong> No throwaway tutorials.</li>
-<li><strong>Capacity first.</strong> Heavy services wait until the lab has the resources to run
-  them properly.</li>
+<li><strong>Git is the source of truth.</strong> After a one-script bootstrap, nothing is installed
+  by hand. Changing the platform means opening a commit, and rolling back means
+  <code>git revert</code>.</li>
+<li><strong>No throwaway tutorials.</strong> No sample apps in sprint namespaces: every component
+  is a real part of the platform.</li>
+<li><strong>Capacity first.</strong> An always-on core plus one heavy profile at a time, each with
+  explicit requests and limits.</li>
+<li><strong>Secrets never go in Git.</strong></li>
+<li><strong>Built by hand first.</strong> Every step is in a written guide with no scripts: what
+  to do, why, and how to check it worked. The bootstrap scripts exist, but only as a
+  shortcut once the manual path is understood.</li>
+<li><strong>Every security control is tested.</strong> A control without a test that proves it
+  blocks something doesn't count.</li>
 </ul>
 <h2 id="the-stack">The Stack</h2>
 <div class="badge-row">
     <span class="badge badge-blue">Kubernetes (kind)</span>
-    <span class="badge badge-green">Helm</span>
+    <span class="badge badge-green">Argo CD</span>
     <span class="badge badge-amber">Traefik</span>
-    <span class="badge badge-blue">Podman</span>
-    <span class="badge badge-green">Fedora 44 / WSL 2</span>
+    <span class="badge badge-blue">Actions Runner Controller</span>
+    <span class="badge badge-green">Headlamp</span>
+    <span class="badge badge-amber">zot</span>
+    <span class="badge badge-blue">KVM / libvirt</span>
+    <span class="badge badge-green">Vagrant</span>
+    <span class="badge badge-green">Helm</span>
+    <span class="badge badge-amber">Podman</span>
+    <span class="badge badge-blue">Fedora 44 / WSL 2</span>
 </div>
 
 <table>
@@ -117,29 +132,54 @@ work against.</p>
 <tr>
 <th>Area</th>
 <th>Today</th>
-<th>Planned</th>
+<th>Next</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>Workstation</td>
-<td>Fedora 44 on WSL 2 or native, VS Code, Podman</td>
+<td>Fedora 44 on WSL 2, VS Code, Podman</td>
 <td>—</td>
 </tr>
 <tr>
-<td>Kubernetes</td>
+<td>Cluster</td>
 <td>kind (single node), kubectl, Helm, k9s</td>
-<td>Argo CD for GitOps</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Delivery</td>
+<td>Argo CD app-of-apps from Git</td>
+<td>Sealed Secrets</td>
 </tr>
 <tr>
 <td>Ingress</td>
-<td>Traefik</td>
-<td>Gateway API, evaluated later</td>
+<td>Traefik on <code>*.platform-lab.localhost:8080</code>, published by kind on loopback</td>
+<td>cert-manager, Gateway API</td>
 </tr>
 <tr>
-<td>Metrics</td>
+<td>Cluster UI</td>
+<td>Headlamp, token sign-in</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Registry</td>
+<td>zot in the cluster, one image name from WSL and from pods</td>
+<td>Authentication</td>
+</tr>
+<tr>
+<td>VM images</td>
+<td>Packer <code>qemu</code> on KVM inside WSL, Vagrant + libvirt</td>
+<td>The Packer pipeline's RHEL and Windows builds on <code>qemu</code></td>
+</tr>
+<tr>
+<td>CI</td>
+<td>GitHub Actions runners in the cluster (ARC), one scale set per repo</td>
+<td>More repos, more in-cluster jobs</td>
+</tr>
+<tr>
+<td>Observability</td>
 <td>Metrics Server</td>
-<td>A lightweight observability stack</td>
+<td>Prometheus + Grafana, then Loki</td>
 </tr>
 <tr>
 <td>Automation</td>
@@ -147,9 +187,19 @@ work against.</p>
 <td>AWX, Jenkins, n8n</td>
 </tr>
 <tr>
-<td>Infrastructure</td>
+<td>Security</td>
+<td>RBAC, local-only access, secrets kept out of Git</td>
+<td>Pod Security <code>restricted</code>, NetworkPolicy, SHA-pinned actions, Sealed Secrets</td>
+</tr>
+<tr>
+<td>Developer portal</td>
 <td>—</td>
-<td>Terraform, a Packer image factory</td>
+<td>Backstage, built from my own app</td>
+</tr>
+<tr>
+<td>Infrastructure</td>
+<td>Packer builds for vSphere run on the lab's runners</td>
+<td>Terraform; AWS once it's worth the cost</td>
 </tr>
 </tbody>
 </table>

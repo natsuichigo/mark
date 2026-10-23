@@ -19,7 +19,7 @@
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Mark — DevOps &amp; Platform Engineer">
     <meta property="og:title" content="Architecture — Packer Golden Image Pipeline">
-    <meta property="og:description" content="How the repository is organised, and the two build shapes it uses.">
+    <meta property="og:description" content="How the repository is organised, how a vSphere build is shaped, and where it runs.">
     <meta property="og:url" content="https://natsuichigo.github.io/mark/docs/packer-image-pipeline/architecture.html">
     <meta property="og:image" content="https://natsuichigo.github.io/mark/assets/og-image.png">
     <meta property="og:image:width" content="1200">
@@ -86,58 +86,71 @@
         <article class="md-content__inner md-typeset pip-typeset">
 
         <h1 class="page-title">Architecture</h1>
-        <p class="page-sub">How the repository is organised, and the two build shapes it uses.</p>
+        <p class="page-sub">How the repository is organised, how a vSphere build is shaped, and where it runs.</p>
+<h2 id="where-it-runs">Where It Runs</h2>
+<div class="flow">
+<div class="flow-step"><div class="flow-num">1</div><div class="flow-text"><strong>GitHub Actions</strong><span>A push or a manual run queues jobs for <code>runs-on: platform-lab-packer</code></span></div></div>
+<div class="flow-arrow">↓</div>
+<div class="flow-step"><div class="flow-num">2</div><div class="flow-text"><strong>Platform Lab cluster</strong><span>The ARC listener picks the job up over outbound HTTPS and starts an ephemeral runner pod</span></div></div>
+<div class="flow-arrow">↓</div>
+<div class="flow-step"><div class="flow-num">3</div><div class="flow-text"><strong>vCenter</strong><span>Packer creates the build VM through the vSphere API</span></div></div>
+<div class="flow-arrow">↓</div>
+<div class="flow-step"><div class="flow-num">4</div><div class="flow-text"><strong>Build VM</strong><span>Packer and Ansible connect over SSH (Linux) or WinRM (Windows), harden and validate it</span></div></div>
+<div class="flow-arrow">↓</div>
+<div class="flow-step"><div class="flow-num">5</div><div class="flow-text"><strong>Content library</strong><span>The template is published; old versions beyond the retention count are removed</span></div></div>
+</div>
+
+<p>Every connection starts from the runner pod. The kickstart and autounattend files go
+into the VM on a CD (<code>common_data_source = "disk"</code>), not over Packer's built-in HTTP
+server, so the VM never has to reach back into a pod sitting behind WSL's NAT. That is
+what lets a laptop cluster drive the builds. The runner pods have no Kubernetes API
+rights, because Packer never touches the cluster.</p>
 <h2 id="repository-layout">Repository Layout</h2>
 <pre class="dir-tree">
 packer-image-pipeline/
 ├── <span class="hl">builds/</span>
-│   ├── aws/                       <span class="cm"># common.pkrvars.hcl + one folder per OS</span>
-│   │   ├── linux/rhel/8.10/
-│   │   ├── linux/aml23/
-│   │   └── windows/2022/
 │   ├── vmware/                    <span class="cm"># vSphere, common and Linux storage variables</span>
 │   │   ├── linux/rhel/8.10/
 │   │   └── windows/2022/
+│   ├── aws/                       <span class="cm"># Kept, switched off in the home lab</span>
 │   └── _skeleton/                 <span class="cm"># Starting points for a new OS</span>
-├── <span class="hl">ansible/</span>                       <span class="cm"># Playbooks and roles: base, configure, clean, rhel_cis, aml23_cis, ...</span>
-├── scripts/                       <span class="cm"># Bootloader, disk, WinRM, clean-up and credential scripts</span>
+├── <span class="hl">ansible/</span>                       <span class="cm"># Playbooks and roles: base, configure, clean, rhel_cis, ...</span>
+├── scripts/                       <span class="cm"># Disk, WinRM, clean-up and init scripts</span>
 ├── <span class="hl">tests/</span>                         <span class="cm"># Inline validators: linux/*.sh, windows/*.ps1</span>
-├── docs/standards/                <span class="cm"># AWS and vSphere build standards</span>
+├── docs/standards/                <span class="cm"># vSphere (and AWS) build standards</span>
 ├── manifests/                     <span class="cm"># Packer manifest output</span>
 └── .github/
-    ├── workflows/                 <span class="cm"># rhel-, aml23-, windows-2022-golden-image.yml</span>
-    └── actions/                   <span class="cm"># Composite actions: build, packer, summary, clean-up</span>
+    ├── workflows/                 <span class="cm"># rhel-, windows-2022-golden-image.yml</span>
+    └── actions/                   <span class="cm"># Composite actions: build, packer, vmware, summary</span>
 </pre>
 
-<h2 id="two-build-shapes-on-aws">Two Build Shapes on AWS</h2>
+<h2 id="two-builds-on-vsphere">Two Builds on vSphere</h2>
 <div class="stage-box s1">
-<h3>Two-stage (Linux)</h3>
+<h3>RHEL 8.10</h3>
 <ul>
-<li>Stage 1, <code>amazon-ebssurrogate</code>, builds the disk from scratch so the OS gets a custom, CIS-compliant partition layout.</li>
-<li>Stage 2, <code>amazon-ebs</code>, starts from that base AMI and configures, hardens and validates it.</li>
-<li>Two manifests: <code>manifest-aws-base.json</code> and <code>manifest-aws-final.json</code>.</li>
+<li><code>vsphere-iso</code> boots the install ISO and reads a kickstart from an attached CD.</li>
+<li>The VM registers with Red Hat Subscription Manager during the build, then Ansible applies the CIS role.</li>
+<li>Packer connects as an ephemeral build user over SSH.</li>
 </ul>
 </div>
 
 <div class="stage-box s2">
-<h3>Single stage (Windows)</h3>
+<h3>Windows Server 2022</h3>
 <ul>
-<li>Starts from the vendor AMI and only configures it, because no custom partitioning is needed.</li>
-<li>The credential change is the <strong>last</strong> provisioner, with <code>skip_clean = true</code>, so Packer does not try to clean up using a password it just replaced.</li>
-<li>One manifest: <code>manifest-aws-final.json</code>.</li>
+<li><code>vsphere-iso</code> boots the install ISO with an autounattend file and init scripts on a CD (<code>cd_files</code>).</li>
+<li>VMware Tools and WinRM are set up at first boot, then Ansible applies the baseline over WinRM.</li>
+<li>CIS for Windows is left to GPO after domain join.</li>
 </ul>
 </div>
 
-<p>On vSphere, Linux builds boot from a kickstart ISO and Windows from an autounattend
-ISO, and the result is published to a content library as a template.</p>
+<p>Both publish to a vSphere content library as a template.</p>
 <h2 id="pipeline-shape">Pipeline Shape</h2>
 <pre class="dir-tree">
 .github/workflows/&lt;os&gt;-golden-image.yml        <span class="cm"># WHEN to build: triggers, inputs, job env</span>
   └── .github/actions/build/&lt;family&gt;-golden-image  <span class="cm"># HOW: orchestration</span>
-        ├── packer/setup-tools                     <span class="cm"># tools and plugins</span>
+        ├── packer/setup-tools                     <span class="cm"># Packer, plugins, govc</span>
         ├── packer/build-with-validation           <span class="cm"># init / validate / build</span>
-        ├── aws/validate                           <span class="cm"># optional post-build EC2 test</span>
-        ├── aws/ami-cleanup                        <span class="cm"># retention, once per name prefix</span>
+        ├── vmware/content-library-cleanup         <span class="cm"># retention</span>
         └── (summary is a separate job)
 </pre>
 
@@ -148,6 +161,9 @@ ISO, and the result is published to a content library as a template.</p>
   so the init/validate/build and manifest-parsing logic exists once.</li>
 <li>The summary is its own job with <code>if: always()</code>, so it publishes even when a
   build fails.</li>
+<li>Runner labels come from repository variables (<code>RUNNER_LABELS_SMALL</code>,
+  <code>RUNNER_LABELS_LARGE</code>), so pointing the pipeline at the lab's runners is a settings
+  change, not a code change.</li>
 </ul>
 
         </article>

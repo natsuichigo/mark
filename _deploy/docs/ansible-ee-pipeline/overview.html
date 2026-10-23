@@ -18,7 +18,7 @@
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Mark — DevOps &amp; Platform Engineer">
     <meta property="og:title" content="Overview — Ansible EE Pipeline">
-    <meta property="og:description" content="Build, test and promote Ansible Execution Environments for AAP, AWX and ansible-navigator.">
+    <meta property="og:description" content="Build, test and promote Ansible Execution Environments for AAP, AWX and ansible-navigator, trimmed for my home lab.">
     <meta property="og:url" content="https://natsuichigo.github.io/mark/docs/ansible-ee-pipeline/overview.html">
     <meta property="og:image" content="https://natsuichigo.github.io/mark/assets/og-image.png">
     <meta property="og:image:width" content="1200">
@@ -85,7 +85,7 @@
         <article class="md-content__inner md-typeset aep-typeset">
 
         <h1 class="page-title">Overview</h1>
-        <p class="page-sub">Build, test and promote Ansible Execution Environments for AAP, AWX and ansible-navigator.</p>
+        <p class="page-sub">Build, test and promote Ansible Execution Environments for AAP, AWX and ansible-navigator, trimmed for my home lab.</p>
 <p>An <strong>Execution Environment (EE)</strong> is the container image Ansible Automation
 Platform runs every job inside: ansible-core, Python, collections and tools, all
 pinned together. If that image changes underneath a production job, automation
@@ -94,6 +94,10 @@ release artefact: built in CI, tested against real target systems, soaked in dev
 then promoted to prod <strong>without being rebuilt</strong>.</p>
 <div class="callout">
 <p><strong>The core idea.</strong> Production runs exactly the image that was tested. Promotion copies the tested image by tag into the prod repository, behind an approval gate, instead of building it again.</p>
+</div>
+
+<div class="callout warn">
+<p><strong>This is the home-lab edition.</strong> The pipeline was built for an estate that included AWS. The lab has no AWS (it costs money I'm not spending yet), so I switched the AWS content off and kept it as a reference: the <code>amazon.aws</code> and <code>community.aws</code> collections, the AWS CLI, the SSM plugin and the Amazon Linux 2023 test target are commented out with <code>#AWS#</code> markers rather than deleted. The fuller organization version is kept separately. Finished images are copied into the container registry inside my <a href="../platform-lab/index.html">Platform Lab</a> cluster, where AWX pulls them.</p>
 </div>
 
 <h2 id="what-it-builds">What It Builds</h2>
@@ -114,7 +118,7 @@ then promoted to prod <strong>without being rebuilt</strong>.</p>
 <tr>
 <td>Base, compat</td>
 <td>Fedora 40, Python 3.12, ansible-core 2.16</td>
-<td>AlmaLinux 8, Amazon Linux 2023</td>
+<td>AlmaLinux 8</td>
 </tr>
 <tr>
 <td>Derived</td>
@@ -127,7 +131,7 @@ then promoted to prod <strong>without being rebuilt</strong>.</p>
 <strong>Python 3.6</strong> hosts, which is RHEL 8's platform Python.</p>
 <ul>
 <li><strong>Base EEs</strong> hold general-purpose collections from public Galaxy (posix, windows,
-  AWS, VMware, Kubernetes, community.*), plus the AWS CLI, Helm and the SSM plugin.</li>
+  VMware, Kubernetes, community.*), plus Helm.</li>
 <li><strong>The derived EE</strong> adds the AAP collections (<code>ansible.platform</code>,
   <code>ansible.controller</code>, <code>ansible.eda</code>), <code>redhat.*</code> and the <code>infra.*</code>
   configuration-as-code collections, most of them certified content from
@@ -140,6 +144,7 @@ then promoted to prod <strong>without being rebuilt</strong>.</p>
     <span class="badge badge-amber">GitHub Actions</span>
     <span class="badge badge-blue">Container registry</span>
     <span class="badge badge-green">AAP / AWX</span>
+    <span class="badge badge-amber">GitHub-hosted runners</span>
 </div>
 
 <h2 id="repository">Repository</h2>

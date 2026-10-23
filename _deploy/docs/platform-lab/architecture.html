@@ -19,7 +19,7 @@
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Mark — DevOps &amp; Platform Engineer">
     <meta property="og:title" content="Architecture — Platform Lab">
-    <meta property="og:description" content="Four layers, from the workstation up to images and automation.">
+    <meta property="og:description" content="One laptop, one node, and Git deciding what runs on it.">
     <meta property="og:url" content="https://natsuichigo.github.io/mark/docs/platform-lab/architecture.html">
     <meta property="og:image" content="https://natsuichigo.github.io/mark/assets/og-image.png">
     <meta property="og:image:width" content="1200">
@@ -86,50 +86,248 @@
         <article class="md-content__inner md-typeset pl-typeset">
 
         <h1 class="page-title">Architecture</h1>
-        <p class="page-sub">Four layers, from the workstation up to images and automation.</p>
+        <p class="page-sub">One laptop, one node, and Git deciding what runs on it.</p>
 <div class="flow">
-<div class="flow-step"><div class="flow-num">1</div><div class="flow-text"><strong>Workstation layer</strong><span>Fedora 44 (WSL 2 or native), VS Code, Git, Podman, Python and Go, a Python virtual environment for Ansible</span></div></div>
+<div class="flow-step"><div class="flow-num">1</div><div class="flow-text"><strong>Workstation</strong><span>Fedora 44 on WSL 2, VS Code, Podman, kind, kubectl, Helm, k9s; QEMU/KVM, libvirt and Vagrant for VM images</span></div></div>
 <div class="flow-arrow">↓</div>
-<div class="flow-step"><div class="flow-num">2</div><div class="flow-text"><strong>Infrastructure layer</strong><span>Terraform-managed infrastructure and networking definitions (planned)</span></div></div>
+<div class="flow-step"><div class="flow-num">2</div><div class="flow-text"><strong>Cluster</strong><span>A single kind node on Podman, created by <code>bootstrap/cluster-up.sh</code></span></div></div>
 <div class="flow-arrow">↓</div>
-<div class="flow-step"><div class="flow-num">3</div><div class="flow-text"><strong>Platform layer</strong><span>Kubernetes on kind, Helm deployments, Traefik ingress, Metrics Server; Argo CD next</span></div></div>
+<div class="flow-step"><div class="flow-num">3</div><div class="flow-text"><strong>GitOps</strong><span>Argo CD, the only hand-installed chart, syncs everything in <code>kubernetes/argocd/apps/</code></span></div></div>
 <div class="flow-arrow">↓</div>
-<div class="flow-step"><div class="flow-num">4</div><div class="flow-text"><strong>Image and automation layer</strong><span>Packer image factory, Ansible, AWX execution environments, Jenkins, n8n, GitHub Actions</span></div></div>
+<div class="flow-step"><div class="flow-num">4</div><div class="flow-text"><strong>Platform</strong><span>Traefik, Metrics Server, Headlamp, a container registry, GitHub runners; profiles for Prometheus/Grafana, AWX and Backstage</span></div></div>
 </div>
 
+<h2 id="the-gitops-flow">The GitOps Flow</h2>
+<p>A single root Application points at a folder of child Applications (the
+<em>app-of-apps</em> pattern). Each child pulls a pinned chart from upstream and its values
+from this repo. Sync waves bring the platform up in order:</p>
+<div class="flow">
+<div class="flow-step"><div class="flow-num">0</div><div class="flow-text"><strong>Wave 0</strong><span>Traefik, Metrics Server, platform-config (namespaces, quotas, RBAC)</span></div></div>
+<div class="flow-arrow">↓</div>
+<div class="flow-step"><div class="flow-num">1</div><div class="flow-text"><strong>Wave 1</strong><span>Actions Runner Controller, Headlamp (the cluster UI), the lab registry</span></div></div>
+<div class="flow-arrow">↓</div>
+<div class="flow-step"><div class="flow-num">2</div><div class="flow-text"><strong>Wave 2</strong><span>One runner scale set per repo: <code>platform-lab</code> and <code>platform-lab-packer</code></span></div></div>
+<div class="flow-arrow">↓</div>
+<div class="flow-step"><div class="flow-num">3</div><div class="flow-text"><strong>Wave 3</strong><span>Whichever heavy profile is switched on</span></div></div>
+</div>
+
+<h2 id="runners-inside-the-cluster">Runners Inside the Cluster</h2>
+<p>A workflow job with <code>runs-on: platform-lab</code> is picked up by the ARC listener, which
+long-polls GitHub over outbound HTTPS. The controller then starts an ephemeral runner
+pod, which runs the job and is deleted. Because the connection is outbound only, it
+works from behind WSL's NAT, and with a minimum of zero runners nothing runs while idle.
+The runner pod's ServiceAccount has the read-only <code>view</code> role.</p>
+<p>My GitHub account is personal, not an organization, and GitHub only lets a personal
+account register runners <strong>per repository</strong>. So each repo that uses the lab gets its
+own scale set: one Argo CD Application and one values file, sharing the same GitHub App.
+The <a href="../packer-image-pipeline/index.html">Packer pipeline</a> has its own set,
+<code>platform-lab-packer</code>, whose pods get no Kubernetes API rights at all.</p>
+<h2 id="where-each-kind-of-job-runs">Where Each Kind of Job Runs</h2>
+<table>
+<thead>
+<tr>
+<th>Job</th>
+<th>Runs on</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Packer image builds</td>
+<td>In-cluster runners (<code>platform-lab-packer</code>)</td>
+<td>Packer drives vSphere remotely, so the pod only makes outbound connections and needs no KVM or Docker</td>
+</tr>
+<tr>
+<td>Ansible EE and Backstage image builds</td>
+<td>GitHub-hosted runners, pushing to a registry</td>
+<td>Container builds would need privileged Docker-in-Docker pods</td>
+</tr>
+<tr>
+<td>Platform health checks, Ansible against the lab</td>
+<td>In-cluster runners</td>
+<td>They need to reach the cluster</td>
+</tr>
+<tr>
+<td>Terraform for the lab and GitHub settings</td>
+<td>In-cluster runners, apply behind an approval</td>
+<td>Close to the cluster, and a required reviewer gates every apply</td>
+</tr>
+</tbody>
+</table>
+<p>Rule of thumb: <strong>container builds run on GitHub's machines, and jobs that drive
+something in the lab (the cluster, or vSphere for Packer) run on my runners</strong>, so
+runner pods never need privileged mode.</p>
+<h2 id="reaching-the-uis">Reaching the UIs</h2>
+<p>Every UI is an Ingress on Traefik at <code>&lt;name&gt;.platform-lab.localhost:8080</code>. kind has no
+cloud load balancer, so Traefik's Service is a <code>NodePort</code> fixed at 30080. The kind
+cluster definition maps <code>127.0.0.1:8080</code> on the laptop to that port, so the UIs are up
+whenever the cluster is, with no port-forward to keep running. Names ending in
+<code>.localhost</code> resolve to loopback, and the mapping listens on loopback only, so nothing
+is reachable from the network.</p>
+<pre class="dir-tree">
+browser ─► 127.0.0.1:8080 ─► kind node :30080 ─► Traefik ─► Ingress host ─► Service
+           <span class="cm"># kind extraPortMappings      # NodePort            # argocd, headlamp, grafana, ...</span>
+</pre>
+
+<p><strong>Headlamp</strong> is the cluster UI: workloads, logs, events, a shell into pods and YAML
+editing. Every sign-in needs a short-lived ServiceAccount token
+(<code>kubectl create token</code>), so being able to reach the page grants nothing.</p>
+<h2 id="where-images-live">Where Images Live</h2>
+<table>
+<thead>
+<tr>
+<th>Kind</th>
+<th>Built where</th>
+<th>Stored where</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ansible EEs for AWX</td>
+<td>GitHub-hosted runners, or locally with Podman</td>
+<td>The lab registry (zot), at <code>registry.platform-lab.localhost:8080/&lt;name&gt;:&lt;tag&gt;</code></td>
+</tr>
+<tr>
+<td>VM images</td>
+<td>In WSL with Packer's <code>qemu</code> builder on KVM; tested with Vagrant</td>
+<td>qcow2 files and Vagrant boxes on the laptop</td>
+</tr>
+<tr>
+<td>vSphere templates</td>
+<td>The Packer pipeline, on the lab's runners</td>
+<td>The vSphere content library</td>
+</tr>
+</tbody>
+</table>
+<p><strong>One registry name works from both sides.</strong> From WSL, the name resolves to loopback
+and goes through the kind port mapping and Traefik. Pods are pulled by containerd on the
+node, which sits outside cluster DNS, so a <code>hosts.toml</code> on the node points the same name
+at the registry's fixed ClusterIP. A push from the laptop and a pull from AWX use one
+image reference.</p>
+<p><strong>KVM inside WSL.</strong> WSL 2 runs a real Linux kernel with nested virtualization, so
+<code>/dev/kvm</code> is there. Packer's <code>qemu</code> builder installs an AlmaLinux 9 image from a
+kickstart on a CD, validates it inside the build, and writes a qcow2 disk and a Vagrant
+box. No Hyper-V VM, VirtualBox or cloud account is involved.</p>
+<h2 id="security-layers">Security Layers</h2>
+<p>GitHub never connects in: the runner listener long-polls out over HTTPS, so there are
+no open ports. The threat model is about who can run code on the runners and what that
+code can reach:</p>
+<table>
+<thead>
+<tr>
+<th>Risk</th>
+<th>Control</th>
+<th>How it's tested</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Someone else triggers a job</td>
+<td>Fork PRs need approval; only approved actions; read-only default token</td>
+<td>Repo settings; the health workflow still passes</td>
+</tr>
+<tr>
+<td>A trusted action is hijacked</td>
+<td>Actions pinned to commit SHAs, Dependabot keeps them current</td>
+<td><code>grep uses:</code> shows only SHAs</td>
+</tr>
+<tr>
+<td>Job code escapes its pod</td>
+<td>Non-root runners; namespace enforces Pod Security <code>restricted</code></td>
+<td>A privileged pod mounting the node's disk is refused</td>
+</tr>
+<tr>
+<td>Job code attacks the platform</td>
+<td>NetworkPolicy: DNS, HTTPS to the internet and the API only; read-only RBAC</td>
+<td>Before/after reachability test from a test pod; <code>kubectl auth can-i</code></td>
+</tr>
+<tr>
+<td>Job code steals credentials</td>
+<td>No Secrets mounted in job pods; the GitHub App key stays with the listener</td>
+<td>Inspect a live runner pod's volumes</td>
+</tr>
+<tr>
+<td>Infrastructure changed by mistake</td>
+<td>Terraform applies wait for a required reviewer</td>
+<td>Environment protection rule</td>
+</tr>
+</tbody>
+</table>
 <h2 id="repository-layout">Repository Layout</h2>
-<p>The structure is laid out for the whole platform up front, so new components have
-an obvious home:</p>
 <pre class="dir-tree">
 platform-lab/
-├── bootstrap/                     <span class="cm"># Workstation setup scripts (Fedora on WSL, Ubuntu)</span>
+├── bootstrap/                     <span class="cm"># cluster-up.sh, cluster-down.sh, github-app-secrets.sh</span>
 ├── <span class="hl">kubernetes/</span>
-│   ├── kind/platform-lab.yaml     <span class="cm"># The Sprint 1 cluster definition</span>
-│   ├── helm/  argocd/  ingress/   <span class="cm"># Charts, GitOps apps, routing</span>
-│   ├── monitoring/  logging/      <span class="cm"># Prometheus/Grafana, Loki (later)</span>
-│   └── backstage/                 <span class="cm"># Deferred</span>
-├── images/
-│   ├── packer/                    <span class="cm"># Packer templates</span>
-│   ├── execution-environments/    <span class="cm"># Ansible / AWX EEs</span>
-│   └── containers/                <span class="cm"># OCI image builds</span>
-├── infrastructure/
-│   ├── terraform/
-│   └── networking/
-├── automation/
-│   ├── ansible/  awx/  jenkins/  n8n/
-├── pipelines/                     <span class="cm"># Reusable CI/CD templates</span>
-├── docs/  scripts/
+│   ├── kind/platform-lab.yaml     <span class="cm"># The one-node cluster</span>
+│   ├── argocd/
+│   │   ├── root-app.yaml          <span class="cm"># App-of-apps root</span>
+│   │   ├── apps/                  <span class="cm"># Enabled components: Argo CD syncs these</span>
+│   │   └── deferred/              <span class="cm"># Switched-off profiles: git mv to enable</span>
+│   ├── helm/values/               <span class="cm"># One values file per component</span>
+│   ├── platform/                  <span class="cm"># Namespaces, quotas, RBAC</span>
+│   │   └── hardening/             <span class="cm"># NetworkPolicies and security test pods</span>
+│   └── backstage/                 <span class="cm"># Portal source and catalog</span>
+├── scripts/lab-capacity.sh        <span class="cm"># Usage vs the RAM budget</span>
+├── .github/workflows/             <span class="cm"># In-cluster health check, Backstage image build</span>
+├── docs/step-by-step-guide.md     <span class="cm"># The whole build by hand, no scripts</span>
+├── docs/runbooks/                 <span class="cm"># One runbook per phase</span>
+├── images/  infrastructure/  automation/  pipelines/
 └── ARCHITECTURE.MD  ROADMAP.md
 </pre>
 
-<h2 id="the-sprint-1-cluster">The Sprint 1 Cluster</h2>
+<h2 id="namespaces-by-purpose">Namespaces by Purpose</h2>
+<table>
+<thead>
+<tr>
+<th>Namespace</th>
+<th>Runs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>argocd</code></td>
+<td>Argo CD</td>
+</tr>
+<tr>
+<td><code>traefik</code></td>
+<td>Ingress controller</td>
+</tr>
+<tr>
+<td><code>headlamp</code></td>
+<td>Cluster management UI</td>
+</tr>
+<tr>
+<td><code>registry</code></td>
+<td>The lab's container registry (zot)</td>
+</tr>
+<tr>
+<td><code>arc-systems</code> / <code>arc-runners</code></td>
+<td>Runner controller / ephemeral runner pods for each repo's scale set</td>
+</tr>
+<tr>
+<td><code>monitoring</code></td>
+<td>Prometheus, Grafana (profile)</td>
+</tr>
+<tr>
+<td><code>awx</code></td>
+<td>AWX (profile)</td>
+</tr>
+<tr>
+<td><code>backstage</code></td>
+<td>Developer portal (profile)</td>
+</tr>
+<tr>
+<td><code>playground</code></td>
+<td>CKAD/CKA practice, under a ResourceQuota</td>
+</tr>
+</tbody>
+</table>
 <div class="stage-box s1">
-<h3>Deliberately small</h3>
+<h3>Capacity model</h3>
 <ul>
-<li>One <code>kind</code> control-plane node that also runs workloads, with Podman as the node-container provider.</li>
-<li>Traefik as the ingress controller, installed with Helm into its own namespace.</li>
-<li>Metrics Server for <code>kubectl top</code> and resource-based autoscaling.</li>
-<li>Services reached on <code>.localhost</code> names through a loopback-only port-forward: no public DNS, no hosts-file edits, nothing exposed beyond the machine.</li>
+<li>Core, always on: kind node, Argo CD, Traefik, Metrics Server, Headlamp, the registry, ARC. About 1.5–1.8 GB, plus runner pods only while a job runs.</li>
+<li>One heavy profile at a time: observability ~1.0–1.4 GB, AWX ~1.5–2.0 GB, Backstage ~0.6–1.0 GB.</li>
+<li>Every chart sets requests and limits; container builds that need lots of memory run on GitHub-hosted runners instead. A 2 GB VM build in WSL means switching the heavy profile off first.</li>
 </ul>
 </div>
 

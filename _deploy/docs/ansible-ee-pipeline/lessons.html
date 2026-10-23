@@ -108,6 +108,19 @@
 <li><strong>Pin actions to SHAs and let Dependabot move them.</strong> Pinned actions cannot change
   underneath a build; Dependabot proposes updates weekly against <code>dev</code>.</li>
 </ul>
+<h2 id="moving-it-to-the-home-lab">Moving It to the Home Lab</h2>
+<ul>
+<li><strong>Builds stay on GitHub-hosted runners.</strong> <code>ansible-builder</code> builds container images,
+  and the lab's in-cluster runners deliberately have no Docker. Running these builds
+  in the cluster would need privileged Docker-in-Docker pods and about 1 GB more RAM,
+  against the lab's hardening. The workflows read their runner from a <code>RUNNER_LABELS</code>
+  variable that defaults to <code>ubuntu-latest</code>, so that choice stays a setting.</li>
+<li><strong>Trim what the lab doesn't manage.</strong> The lab has no AWS, so the AWS collections,
+  CLI, SSM plugin and the Amazon Linux 2023 target are switched off. Each check that
+  tested them is switched off with it, so validation still means something.</li>
+<li><strong>Switch off, don't delete.</strong> <code>#AWS#</code> markers keep the AWS content readable in place
+  and easy to restore.</li>
+</ul>
 <h2 id="next-steps">Next Steps</h2>
 <table>
 <thead>
@@ -124,6 +137,10 @@
 <tr>
 <td>Retire the compat track</td>
 <td>Once no Python 3.6 hosts remain, the 2.16 images and their tests can go</td>
+</tr>
+<tr>
+<td>Run the EE in AWX in Platform Lab</td>
+<td>The lab now has its own registry; copying an EE there with <code>skopeo</code> is the hand-off, and AWX's automation profile (Phase 5) runs it</td>
 </tr>
 <tr>
 <td>Enable ARA reporting</td>

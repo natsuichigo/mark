@@ -17,10 +17,13 @@ What happens between a push to dev and an image AAP can run.
 
 | EE | Check | What it proves |
 |---|---|---|
-| Base 2.18 / 2.16 | `validation.yml` via `ansible-navigator` | ansible-core version, collections, AWS CLI, Helm, SSM plugin |
-| Base 2.18 | `latest-target-test.yml` | firewalld, systemd, sysctl and boto3 work against AlmaLinux 9 and Ubuntu 22.04 |
-| Base 2.16 | `compat-target-test.yml` | The same against AlmaLinux 8 (Python 3.6) and Amazon Linux 2023 |
-| Derived | `derived/validation.yml` | ansible, collections, `ansible.platform`, AWS CLI |
+| Base 2.18 / 2.16 | `validation.yml` via `ansible-navigator` | ansible-core version, collections, Helm |
+| Base 2.18 | `latest-target-test.yml` | firewalld, systemd and sysctl work against AlmaLinux 9 and Ubuntu 22.04 |
+| Base 2.16 | `compat-target-test.yml` | The same against AlmaLinux 8 (Python 3.6) |
+| Derived | `derived/validation.yml` | ansible, collections, `ansible.platform` |
+
+In the home lab the AWS checks (AWS CLI, SSM plugin, `boto3`, the Amazon Linux 2023
+target) are commented out with `#AWS#` markers, along with the tools they tested.
 
 The target tests run **inside** the EE and reach the target containers through the
 `community.docker.docker_api` connection plugin over the mounted Docker socket, so

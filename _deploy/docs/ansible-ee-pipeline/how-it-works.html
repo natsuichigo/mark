@@ -112,25 +112,27 @@
 <tr>
 <td>Base 2.18 / 2.16</td>
 <td><code>validation.yml</code> via <code>ansible-navigator</code></td>
-<td>ansible-core version, collections, AWS CLI, Helm, SSM plugin</td>
+<td>ansible-core version, collections, Helm</td>
 </tr>
 <tr>
 <td>Base 2.18</td>
 <td><code>latest-target-test.yml</code></td>
-<td>firewalld, systemd, sysctl and boto3 work against AlmaLinux 9 and Ubuntu 22.04</td>
+<td>firewalld, systemd and sysctl work against AlmaLinux 9 and Ubuntu 22.04</td>
 </tr>
 <tr>
 <td>Base 2.16</td>
 <td><code>compat-target-test.yml</code></td>
-<td>The same against AlmaLinux 8 (Python 3.6) and Amazon Linux 2023</td>
+<td>The same against AlmaLinux 8 (Python 3.6)</td>
 </tr>
 <tr>
 <td>Derived</td>
 <td><code>derived/validation.yml</code></td>
-<td>ansible, collections, <code>ansible.platform</code>, AWS CLI</td>
+<td>ansible, collections, <code>ansible.platform</code></td>
 </tr>
 </tbody>
 </table>
+<p>In the home lab the AWS checks (AWS CLI, SSM plugin, <code>boto3</code>, the Amazon Linux 2023
+target) are commented out with <code>#AWS#</code> markers, along with the tools they tested.</p>
 <p>The target tests run <strong>inside</strong> the EE and reach the target containers through the
 <code>community.docker.docker_api</code> connection plugin over the mounted Docker socket, so
 no SSH is involved.</p>

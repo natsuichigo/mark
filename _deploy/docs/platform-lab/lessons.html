@@ -18,7 +18,7 @@
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Mark — DevOps &amp; Platform Engineer">
     <meta property="og:title" content="Lessons &amp; Next Steps — Platform Lab">
-    <meta property="og:description" content="Decisions made so far, and the roadmap.">
+    <meta property="og:description" content="Decisions, the problems hit along the way, and the roadmap.">
     <meta property="og:url" content="https://natsuichigo.github.io/mark/docs/platform-lab/lessons.html">
     <meta property="og:image" content="https://natsuichigo.github.io/mark/assets/og-image.png">
     <meta property="og:image:width" content="1200">
@@ -85,60 +85,176 @@
         <article class="md-content__inner md-typeset pl-typeset">
 
         <h1 class="page-title">Lessons &amp; Next Steps</h1>
-        <p class="page-sub">Decisions made so far, and the roadmap.</p>
+        <p class="page-sub">Decisions, the problems hit along the way, and the roadmap.</p>
 <h2 id="decisions-so-far">Decisions So Far</h2>
 <ul>
-<li><strong>Traefik instead of ingress-nginx.</strong> The architecture first named ingress-nginx,
-  but that project was retired in March 2026 and no longer receives security fixes.
-  Sprint 1 uses Traefik instead, with the Ingress API for now; Gateway API is the
-  recommended direction for new designs and will be evaluated in a later sprint.</li>
+<li><strong>GitOps from day one.</strong> The first version was a runbook of <code>kubectl create</code>
+  commands and a demo app in a <code>sprint1</code> namespace. Now only kind and Argo CD are
+  installed by hand, and everything else is a file in Git. The cluster is disposable:
+  one script rebuilds it.</li>
+<li><strong>Profiles instead of "not enough RAM".</strong> Rather than deferring Prometheus, AWX and
+  Backstage indefinitely, each is a ready-made app that switches on with a <code>git mv</code>. The
+  laptop runs the whole stack, just not all of it at the same time.</li>
+<li><strong>Builds run where the RAM is.</strong> Building a Backstage image needs about 3 GB, so it
+  runs on a GitHub-hosted runner and pushes to GHCR. The laptop only pulls and runs it.</li>
+<li><strong>Runners without Docker-in-Docker.</strong> DinD needs privileged pods, which are awkward
+  under rootless Podman, and a lot of memory. In-cluster runners do cluster-facing jobs
+  and scale to zero when idle.</li>
+<li><strong>A GitHub App, not a personal token.</strong> Scoped permissions and short-lived tokens. One
+  app serves both Argo CD and the runners. Splitting it into least-privilege apps is on
+  the hardening list.</li>
+<li><strong>Secrets stay off Git.</strong> They're created from a local file by a script. Sealed
+  Secrets will make them GitOps too.</li>
+<li><strong>Traefik instead of ingress-nginx.</strong> ingress-nginx was retired in March 2026 and no
+  longer receives security fixes. The lab uses the Ingress API for now and will evaluate
+  Gateway API later.</li>
 <li><strong>Podman as the kind provider.</strong> It keeps the lab free of a Windows-side container
-  runtime. The trade-off is rootless networking, which can need extra host
-  capabilities when the cluster or ingress misbehaves.</li>
-<li><strong>Local-only by default.</strong> <code>.localhost</code> names and a loopback-bound port-forward keep
-  everything on the machine. Nothing is exposed until there is a reason to.</li>
-<li><strong>Capacity before features.</strong> Backstage, AWX, Jenkins, n8n and the full
-  Prometheus/Grafana/Loki stack wait until the lab has the resources. A single node
-  that runs well beats a crowded one that doesn't.</li>
+  runtime. The trade-off is rootless networking quirks.</li>
+<li><strong>Local-only by default, without a port-forward.</strong> <code>.localhost</code> names and a kind port
+  mapping bound to <code>127.0.0.1</code> keep everything on the machine. The mapping is part of
+  the cluster definition, so the UIs survive reboots with nothing left running in a
+  terminal.</li>
+<li><strong>Headlamp as the cluster UI.</strong> The Kubernetes Dashboard project has been retired and
+  points to Headlamp. It's light enough for the core (under 200 MB), and token sign-in
+  means reaching the page grants nothing. Argo CD's self-heal undoes edits made in the
+  UI to anything it manages, so lasting changes still go through Git.</li>
+<li><strong>One runner scale set per repo.</strong> A personal GitHub account can't share runners
+  across repos the way an organization can. Each repo that uses the lab gets its own
+  small scale set (one Application, one values file, the same GitHub App), and each can
+  have its own rights: the Packer runners get no Kubernetes API access at all.</li>
+<li><strong>WSL 2 rather than a full VM.</strong> WSL is already a lightweight VM whose memory grows
+  and shrinks. A Hyper-V or VirtualBox VM would lock away a fixed share of the 8 GB, plus
+  about 0.5–1 GB for a second OS, which is the size of a whole profile. The next step up
+  is a dedicated second-hand home server, not a VM on the same laptop.</li>
+<li><strong>GitHub, not self-hosted GitLab.</strong> GitLab needs 4–8 GB on its own, and running Git
+  inside the cluster it rebuilds would mean losing both together. GitLab CI experience
+  can come later from free gitlab.com plus a GitLab Runner in the cluster, which is
+  light and also outbound-only.</li>
+<li><strong>zot as the lab registry.</strong> Harbor needs about 2 GB across half a dozen pods; zot is
+  one small binary with a UI and search. It has no authentication for now, because it's
+  reachable only from the cluster and from loopback. That's written down as a gap, not
+  forgotten.</li>
+<li><strong>A fixed ClusterIP for containerd.</strong> containerd runs on the node, outside cluster DNS,
+  so it can't resolve <code>zot.registry.svc</code>. A pinned Service address and a <code>hosts.toml</code>
+  give it something stable to point at, without exposing the registry on another port.</li>
+<li><strong>KVM in WSL rather than a VM beside it.</strong> Nested virtualization makes WSL a working KVM
+  host, so VM images build with the same Linux tooling a real hypervisor host would use.
+  Vagrant on libvirt turns a built image into a test VM with one command.</li>
+<li><strong>AWS kept as reference code.</strong> Building on AWS costs money I'm not spending yet, so the
+  pipelines keep their AWS code commented out with <code>#AWS#</code> markers rather than deleting it.</li>
+<li><strong>Security controls are tested, not assumed.</strong> A NetworkPolicy does nothing if the
+  network plugin doesn't enforce it, so the hardening steps start by proving
+  enforcement with a deny-all policy.</li>
+</ul>
+<h2 id="problems-hit-and-what-they-taught">Problems Hit (and What They Taught)</h2>
+<div class="stage-box s1">
+<h3>TLS to GitHub failed: "certificate is valid for *.aserv.co.za"</h3>
+<ul>
+<li><strong>Symptom:</strong> Argo CD couldn't read the repo, and later couldn't get a GitHub App token. GitHub was serving the wrong certificate.</li>
+<li><strong>Cause:</strong> pods use <code>ndots:5</code>, so <code>github.com</code> (one dot) is tried with each search domain first. The laptop's search list, inherited from Windows through WSL and Podman, included a domain with a wildcard DNS record. <code>github.com.&lt;that domain&gt;</code> resolved to a web host, and the TLS check rightly refused it. WSL itself resolved correctly, because outside Kubernetes the default <code>ndots:1</code> doesn't search first.</li>
+<li><strong>Diagnosis:</strong> I compared <code>/etc/resolv.conf</code> in WSL, the kind node and an Argo CD pod, then resolved <code>github.com.&lt;search domain&gt;</code> for each domain in the list until one answered.</li>
+<li><strong>Fix:</strong> stop WSL generating <code>resolv.conf</code> and keep only the search domains that are needed, then clean the node and restart the pods. The root fix is removing the wildcard record. Rebuilding the cluster alone doesn't help, because each new node copies the host's DNS settings again.</li>
+</ul>
+</div>
+
+<div class="stage-box s2">
+<h3>"Resource not found in cluster: Application arc-runners"</h3>
+<ul>
+<li><strong>Symptom:</strong> after moving Traefik to a NodePort and adding Headlamp, the root app never created the <code>arc-runners</code> Application.</li>
+<li><strong>Cause:</strong> sync waves. Wave 2 waits for every wave 1 app to be Healthy, and Headlamp sat at <em>Progressing</em>. Its pod was fine, but Argo CD only calls an Ingress Healthy once it has an address, and Traefik copies that address from its own Service. A NodePort Service has no load balancer address, so there was nothing to copy.</li>
+<li><strong>Diagnosis:</strong> the root app's operation message (<code>waiting for healthy state of Application/headlamp</code>), then an empty <code>ADDRESS</code> column in <code>kubectl get ingress</code>.</li>
+<li><strong>Fix:</strong> tell Traefik to publish a fixed endpoint (<code>ingressEndpoint.ip: 127.0.0.1</code>, which is where the routes really are). One setting fixes every Ingress in the lab, including the Grafana, AWX and Backstage profiles that would have hit the same wall.</li>
+</ul>
+</div>
+
+<ul>
+<li><strong>"Revision develop must be resolved" isn't about the branch.</strong> Argo CD couldn't reach
+  GitHub at all. Reading the application's status conditions
+  (<code>kubectl get application -o jsonpath='{.status.conditions}'</code>) gave the real error.</li>
+<li><strong>Argo CD reads GitHub, not the laptop.</strong> Manifests that only exist locally don't
+  exist for Argo CD. The rule is: change, commit, push, then sync.</li>
+<li><strong>A private repo needs credentials.</strong> The same GitHub App serves Argo CD (read access)
+  and the runners (registration). Splitting it into least-privilege apps is on the
+  hardening list.</li>
+<li><strong>A warning isn't an error.</strong> Helm prints <code>unrecognized format "int64"</code> when installing
+  charts with CRDs. It's the API server noting a schema format label it doesn't check,
+  and the install still succeeds. Check the result (<code>helm list</code>, the pods), not the noise.</li>
+<li><strong>Don't hand-install what GitOps owns.</strong> A manually installed Traefik (a <code>LoadBalancer</code>
+  Service stuck on <code>&lt;pending&gt;</code> in kind) would clash with the Argo CD-managed one
+  (a fixed <code>NodePort</code>). Hand installs are for troubleshooting only, and removed before
+  the sync.</li>
+<li><strong>"Healthy" depends on what the controller reports.</strong> A running pod isn't enough for
+  Argo CD. Each resource kind has its own health check, and an Ingress needs a status
+  address. With sync waves, one Progressing app quietly holds back everything after it.</li>
 </ul>
 <h2 id="roadmap">Roadmap</h2>
 <table>
 <thead>
 <tr>
-<th>Sprint</th>
+<th>Phase</th>
 <th>Goal</th>
 <th>Status</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Sprint 0</td>
+<td>0</td>
 <td>Workstation tooling, repository structure, GitHub metadata</td>
 <td>Done</td>
 </tr>
 <tr>
-<td>Sprint 1</td>
-<td>kind cluster, Helm, ingress, Metrics Server, a sample app, CKAD labs</td>
-<td>In progress</td>
+<td>1</td>
+<td>kind cluster and Argo CD bootstrap; GitHub App</td>
+<td>Done: DNS issue fixed, Argo CD syncing from GitHub</td>
 </tr>
 <tr>
-<td>Sprint 2</td>
-<td>Argo CD with its UI on a local Traefik route; manage an app from Git</td>
-<td>Next</td>
+<td>2</td>
+<td>Core platform from Git: Traefik, Metrics Server, namespaces and RBAC, Headlamp; UIs with no port-forward</td>
+<td>In progress: deployed from Git; rebuild test next</td>
 </tr>
 <tr>
-<td>Later</td>
-<td>cert-manager, lightweight observability, Headlamp; then Backstage, AWX, Jenkins, n8n as capacity allows; Terraform and a Packer image factory</td>
+<td>3</td>
+<td>GitHub Actions runners in the cluster (ARC), one scale set per repo</td>
+<td>In progress: controller running; <code>platform-lab</code> and <code>platform-lab-packer</code> scale sets defined</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Observability profile: Prometheus and Grafana, then Loki</td>
 <td>Planned</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Automation profile: AWX with my own execution environment, stored in the lab registry</td>
+<td>In progress: registry tested end to end; AWX next</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Developer portal: my own Backstage app</td>
+<td>Planned</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Hardening: threat model, Pod Security, NetworkPolicy, SHA-pinned actions, approvals; then Sealed Secrets, cert-manager, Gateway API</td>
+<td>Planned (guide written)</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Jenkins, n8n; optional GitLab Runner against gitlab.com</td>
+<td>Planned</td>
+</tr>
+<tr>
+<td>9</td>
+<td>VM images on KVM in WSL (Packer <code>qemu</code>, Vagrant); Terraform with GitHub OIDC</td>
+<td>In progress: AlmaLinux 9 template written, first build next</td>
 </tr>
 </tbody>
 </table>
 <h2 id="goals-behind-it">Goals Behind It</h2>
 <p>The lab supports working towards the <strong>CKAD</strong>, <strong>CKA</strong> and an <strong>AWS Associate</strong>
-certification, and it gives the other projects on this site a place to run: the
-<a href="../packer-image-pipeline/index.html">Packer pipeline</a> and the
-<a href="../ansible-ee-pipeline/index.html">Ansible EE pipeline</a> both have homes in its
-<code>images/</code> folder.</p>
+certification, and it gives the other projects on this site a place to run. The
+<a href="../ansible-ee-pipeline/index.html">Ansible EE pipeline</a> image becomes AWX's execution
+environment in Phase 5. The <a href="../packer-image-pipeline/index.html">Packer pipeline</a>
+already uses it: its builds run on the lab's own runner scale set.</p>
 
         </article>
       </div>
