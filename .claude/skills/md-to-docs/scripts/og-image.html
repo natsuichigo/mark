@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<!-- Source for _deploy/assets/og-image.png (the link-preview image, 1200x630).
+     Re-render with: ./render_og_image.sh -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; }
+  body {
+    background: linear-gradient(135deg, #1e293b 0%, #4f46e5 60%, #0ea5e9 100%);
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    color: #ffffff;
+    position: relative;
+  }
+  .wrap { position: absolute; left: 96px; right: 96px; top: 120px; display: flex; gap: 44px; align-items: flex-start; }
+  svg { flex: none; width: 128px; height: 128px; margin-top: 6px; }
+  h1 { margin: 0; font-size: 84px; font-weight: 600; line-height: 1; letter-spacing: 0.5px; }
+  .role { margin: 22px 0 0; font-size: 34px; font-weight: 500; opacity: 0.95; }
+  .bar { width: 84px; height: 6px; border-radius: 3px; background: #f59e0b; margin: 26px 0 24px; }
+  .stack { margin: 0; font-size: 27px; opacity: 0.9; }
+  .years { margin: 10px 0 0; font-size: 27px; opacity: 0.9; }
+  .url { position: absolute; left: 96px; bottom: 56px; font-size: 24px; opacity: 0.75; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <svg viewBox="0 0 56 56" aria-hidden="true">
+      <rect x="2" y="2" width="52" height="52" rx="13" fill="none" stroke="#fff" stroke-width="4.5"/>
+      <path d="M15 42 V16 L28 31 L41 16 V42" fill="none" stroke="#fff" stroke-width="5"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div>
+      <h1>Mark Bam</h1>
+      <p class="role">Systems Engineer II · DevOps &amp; Platform Engineer</p>
+      <div class="bar"></div>
+      <p class="stack">Ansible Automation Platform · Terraform · AWS · VMware</p>
+      <p class="years">10+ years in enterprise IT</p>
+    </div>
+  </div>
+  <div class="url">natsuichigo.github.io/mark</div>
+</body>
+</html>
