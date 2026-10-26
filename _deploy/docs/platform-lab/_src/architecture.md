@@ -8,7 +8,7 @@ One laptop, one node, and Git deciding what runs on it.
 <div class="flow-arrow">↓</div>
 <div class="flow-step"><div class="flow-num">3</div><div class="flow-text"><strong>GitOps</strong><span>Argo CD, the only hand-installed chart, syncs everything in <code>kubernetes/argocd/apps/</code></span></div></div>
 <div class="flow-arrow">↓</div>
-<div class="flow-step"><div class="flow-num">4</div><div class="flow-text"><strong>Platform</strong><span>Traefik, Metrics Server, Headlamp, a container registry, GitHub runners; profiles for Prometheus/Grafana, AWX and Backstage</span></div></div>
+<div class="flow-step"><div class="flow-num">4</div><div class="flow-text"><strong>Platform</strong><span>Tailscale operator, Metrics Server, Headlamp, a container registry, GitHub runners; profiles for Prometheus/Grafana, AWX and Backstage</span></div></div>
 </div>
 
 ## The GitOps Flow
@@ -18,13 +18,13 @@ A single root Application points at a folder of child Applications (the
 from this repo. Sync waves bring the platform up in order:
 
 <div class="flow">
-<div class="flow-step"><div class="flow-num">0</div><div class="flow-text"><strong>Wave 0</strong><span>Traefik, Metrics Server, platform-config (namespaces, quotas, RBAC)</span></div></div>
+<div class="flow-step"><div class="flow-num">0</div><div class="flow-text"><strong>Wave 0</strong><span>Metrics Server, platform-config (namespaces, quotas, RBAC)</span></div></div>
 <div class="flow-arrow">↓</div>
-<div class="flow-step"><div class="flow-num">1</div><div class="flow-text"><strong>Wave 1</strong><span>Actions Runner Controller, Headlamp (the cluster UI), the lab registry</span></div></div>
+<div class="flow-step"><div class="flow-num">1</div><div class="flow-text"><strong>Wave 1</strong><span>Tailscale operator, Headlamp (the cluster UI), the lab registry</span></div></div>
 <div class="flow-arrow">↓</div>
-<div class="flow-step"><div class="flow-num">2</div><div class="flow-text"><strong>Wave 2</strong><span>One runner scale set per repo: <code>platform-lab</code> and <code>platform-lab-packer</code></span></div></div>
+<div class="flow-step"><div class="flow-num">2</div><div class="flow-text"><strong>Wave 2</strong><span>The tailnet Ingresses: one private HTTPS name per UI</span></div></div>
 <div class="flow-arrow">↓</div>
-<div class="flow-step"><div class="flow-num">3</div><div class="flow-text"><strong>Wave 3</strong><span>Whichever heavy profile is switched on</span></div></div>
+<div class="flow-step"><div class="flow-num">3</div><div class="flow-text"><strong>Wave 3</strong><span>Whichever heavy profile is switched on, bringing its own tailnet Ingress</span></div></div>
 </div>
 
 ## Runners Inside the Cluster
@@ -56,34 +56,41 @@ runner pods never need privileged mode.
 
 ## Reaching the UIs
 
-Every UI is an Ingress on Traefik at `<name>.platform-lab.localhost`. kind has no
-cloud load balancer, so Traefik's Service is a `NodePort` fixed at 30080. The kind
-cluster definition maps `127.0.0.1:80` on the laptop to that port, so the UIs are up
-whenever the cluster is, with no port-forward to keep running. Names ending in
-`.localhost` resolve to loopback, and the mapping listens on loopback only, so nothing
-is reachable from the network.
+Every UI is private to my tailnet, the WireGuard network
+[Tailscale](https://tailscale.com/) builds between my own devices. Each UI has an
+Ingress with `ingressClassName: tailscale`. The Tailscale operator turns each one into
+its own tailnet machine (`argocd`, `headlamp`, `registry`, and `grafana`, `awx` or
+`backstage` when that profile is on) with a MagicDNS name and a real Let's Encrypt
+certificate. HTTPS ends at a small proxy pod, which forwards plain HTTP to the Service
+inside the cluster.
 
 <pre class="dir-tree">
-browser ─► 127.0.0.1:80 ─► kind node :30080 ─► Traefik ─► Ingress host ─► Service
-           <span class="cm"># kind extraPortMappings      # NodePort            # argocd, headlamp, grafana, ...</span>
+phone / laptop ─► WireGuard ─► proxy pod "argocd" ─► Service argocd-server
+<span class="cm"># Tailscale on      # tailnet      # HTTPS ends here     # plain HTTP inside the cluster</span>
 </pre>
+
+All connections are outbound from the cluster, so there are no port mappings and
+nothing listens on the laptop or the LAN. The UIs work the same from the laptop or my
+phone, and the same files will work unchanged on a home server. Who may connect is set
+in the tailnet policy, which grants only my own user access to the UI machines.
 
 **Headlamp** is the cluster UI: workloads, logs, events, a shell into pods and YAML
 editing. It has no login: it acts as its own `cluster-admin` ServiceAccount, so access
-is decided by who can reach it. A Traefik IP allow-list admits only requests that came in
-through the laptop's port mapping, and a NetworkPolicy lets only Traefik connect to the
-pod. Both were tested from a pod: `403` through Traefik, a timeout when called directly.
+is decided by who can reach it. Two layers decide that. The tailnet policy lets only my
+user reach the `headlamp` machine, and a NetworkPolicy lets only the Tailscale proxy pods
+connect to the Headlamp pod, so nothing else inside the cluster can reach it either.
 
 ## Where Images Live
 
 | Kind | Built where | Stored where |
 |---|---|---|
-| Ansible EEs for AWX | GitHub-hosted runners, or locally with Podman | The lab registry (zot), at `registry.platform-lab.localhost/<name>:<tag>` |
+| Ansible EEs for AWX | GitHub-hosted runners, or locally with Podman | The lab registry (zot), at `registry.<tailnet>.ts.net/<name>:<tag>` |
 | VM images | In WSL with Packer's `qemu` builder on KVM; tested with Vagrant | qcow2 files and Vagrant boxes on the laptop |
 | vSphere templates | The Packer pipeline, on the lab's runners | The vSphere content library |
 
-**One registry name works from both sides.** From WSL, the name resolves to loopback
-and goes through the kind port mapping and Traefik. Pods are pulled by containerd on the
+**One registry name works from both sides.** From WSL and my other devices, the name is
+the registry's own tailnet machine, with a real HTTPS certificate, so Podman needs no
+"insecure registry" setting. Pods are pulled by containerd on the
 node, which sits outside cluster DNS, so a `hosts.toml` on the node points the same name
 at the registry's fixed ClusterIP. A push from the laptop and a pull from AWX use one
 image reference.
@@ -95,9 +102,10 @@ box. No Hyper-V VM, VirtualBox or cloud account is involved.
 
 ## Security Layers
 
-GitHub never connects in: the runner listener long-polls out over HTTPS, so there are
-no open ports. The threat model is about who can run code on the runners and what that
-code can reach:
+Nothing connects in. The UIs are reached over Tailscale, which only needs outbound
+connections, and the runner listener long-polls GitHub over HTTPS. So the lab has no
+open ports, and only my tailnet user can reach a UI. The rest of the threat model is
+about who can run code on the runners and what that code can reach:
 
 | Risk | Control | How it's tested |
 |---|---|---|
@@ -112,7 +120,7 @@ code can reach:
 
 <pre class="dir-tree">
 platform-lab/
-├── bootstrap/                     <span class="cm"># cluster-up.sh, cluster-down.sh, github-app-secrets.sh</span>
+├── bootstrap/                     <span class="cm"># cluster-up.sh, cluster-down.sh, secret scripts</span>
 ├── <span class="hl">kubernetes/</span>
 │   ├── kind/platform-lab.yaml     <span class="cm"># The one-node cluster</span>
 │   ├── argocd/
@@ -120,6 +128,7 @@ platform-lab/
 │   │   ├── apps/                  <span class="cm"># Enabled components: Argo CD syncs these</span>
 │   │   └── deferred/              <span class="cm"># Switched-off profiles: git mv to enable</span>
 │   ├── helm/values/               <span class="cm"># One values file per component</span>
+│   ├── ingress/                   <span class="cm"># Tailnet Ingresses: one private HTTPS name per UI</span>
 │   ├── platform/                  <span class="cm"># Namespaces, quotas, RBAC</span>
 │   │   └── hardening/             <span class="cm"># NetworkPolicies and security test pods</span>
 │   └── backstage/                 <span class="cm"># Portal source and catalog</span>
@@ -136,7 +145,7 @@ platform-lab/
 | Namespace | Runs |
 |---|---|
 | `argocd` | Argo CD |
-| `traefik` | Ingress controller |
+| `tailscale` | Tailscale operator, plus one proxy pod per UI |
 | `headlamp` | Cluster management UI |
 | `registry` | The lab's container registry (zot) |
 | `arc-systems` / `arc-runners` | Runner controller / ephemeral runner pods for each repo's scale set |
@@ -148,7 +157,7 @@ platform-lab/
 <div class="stage-box s1">
 <h3>Capacity model</h3>
 <ul>
-<li>Core, always on: kind node, Argo CD, Traefik, Metrics Server, Headlamp, the registry, ARC. About 1.5–1.8 GB, plus runner pods only while a job runs.</li>
+<li>Core, always on: kind node, Argo CD, Tailscale operator, Metrics Server, Headlamp, the registry, ARC. About 1.5–1.8 GB, plus runner pods only while a job runs.</li>
 <li>One heavy profile at a time: observability ~1.0–1.4 GB, AWX ~1.5–2.0 GB, Backstage ~0.6–1.0 GB.</li>
 <li>Every chart sets requests and limits; container builds that need lots of memory run on GitHub-hosted runners instead. A 2 GB VM build in WSL means switching the heavy profile off first.</li>
 </ul>

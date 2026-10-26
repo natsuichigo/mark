@@ -9,7 +9,7 @@ hypervisor for VM images) on one 8 GB laptop, with no cloud bill. It is also how
 study on is the platform itself.
 
 <div class="callout">
-<p><strong>Status: in progress.</strong> The kind cluster and Argo CD are running and syncing from GitHub through a GitHub App, after a DNS search-domain clash that broke TLS to GitHub was found and fixed. The core platform (Traefik, Metrics Server, RBAC and the Headlamp cluster UI) deploys from Git, and every UI opens with no port-forward. In-cluster runners for this repo and the Packer pipeline are next, then hardening. See the <a href="./lessons.html">roadmap and problems log</a>.</p>
+<p><strong>Status: in progress.</strong> The kind cluster and Argo CD are running and syncing from GitHub through a GitHub App, after a DNS search-domain clash that broke TLS to GitHub was found and fixed. The core platform (Metrics Server, RBAC, the Headlamp cluster UI and the lab registry) deploys from Git. Every UI is private to my tailnet: the Tailscale operator gives each one its own name and HTTPS certificate, with no open ports. In-cluster runners for this repo and the Packer pipeline are next, then hardening. See the <a href="./lessons.html">roadmap and problems log</a>.</p>
 </div>
 
 ## Principles
@@ -33,7 +33,7 @@ study on is the platform itself.
 <div class="badge-row">
     <span class="badge badge-blue">Kubernetes (kind)</span>
     <span class="badge badge-green">Argo CD</span>
-    <span class="badge badge-amber">Traefik</span>
+    <span class="badge badge-amber">Tailscale</span>
     <span class="badge badge-blue">Actions Runner Controller</span>
     <span class="badge badge-green">Headlamp</span>
     <span class="badge badge-amber">zot</span>
@@ -49,14 +49,14 @@ study on is the platform itself.
 | Workstation | Fedora 44 on WSL 2, VS Code, Podman | — |
 | Cluster | kind (single node), kubectl, Helm, k9s | — |
 | Delivery | Argo CD app-of-apps from Git | Sealed Secrets |
-| Ingress | Traefik on `*.platform-lab.localhost`, published by kind on loopback | cert-manager, Gateway API |
-| Cluster UI | Headlamp, no login, reachable only from the laptop | — |
+| Access | Tailscale operator: one tailnet name and HTTPS certificate per UI, reachable from my own devices only | Gateway API |
+| Cluster UI | Headlamp, no login, reachable only by my tailnet user | — |
 | Registry | zot in the cluster, one image name from WSL and from pods | Authentication |
 | VM images | Packer `qemu` on KVM inside WSL, Vagrant + libvirt | The Packer pipeline's RHEL and Windows builds on `qemu` |
 | CI | GitHub Actions runners in the cluster (ARC), one scale set per repo | More repos, more in-cluster jobs |
 | Observability | Metrics Server | Prometheus + Grafana, then Loki |
 | Automation | Ansible, GitHub Actions | AWX, Jenkins, n8n |
-| Security | RBAC, local-only access, secrets kept out of Git | Pod Security `restricted`, NetworkPolicy, SHA-pinned actions, Sealed Secrets |
+| Security | RBAC, tailnet-only access with no open ports, secrets kept out of Git | Pod Security `restricted`, NetworkPolicy, SHA-pinned actions, Sealed Secrets |
 | Developer portal | — | Backstage, built from my own app |
 | Infrastructure | Packer builds for vSphere run on the lab's runners | Terraform; AWS once it's worth the cost |
 

@@ -98,7 +98,7 @@ manifests act as the answer key: I write each file from the explanation, then co
 <div class="flow-arrow">↓</div>
 <div class="flow-step"><div class="flow-num">3</div><div class="flow-text"><strong>Bootstrap</strong><span>Create the kind cluster and install Argo CD with Helm, by hand from the guide (<code>./bootstrap/cluster-up.sh</code> is the same steps scripted)</span></div></div>
 <div class="flow-arrow">↓</div>
-<div class="flow-step"><div class="flow-num">4</div><div class="flow-text"><strong>Argo CD takes over</strong><span>The root app syncs Traefik, Metrics Server, RBAC and the runner controller from Git</span></div></div>
+<div class="flow-step"><div class="flow-num">4</div><div class="flow-text"><strong>Argo CD takes over</strong><span>The root app syncs Metrics Server, RBAC, the Tailscale operator and the UIs from Git</span></div></div>
 <div class="flow-arrow">↓</div>
 <div class="flow-step"><div class="flow-num">5</div><div class="flow-text"><strong>Run a job in the cluster</strong><span>The <code>platform-health</code> workflow runs on <code>runs-on: platform-lab</code> in an ephemeral pod</span></div></div>
 <div class="flow-arrow">↓</div>
@@ -111,25 +111,25 @@ values from this repo.</p>
 <pre><code class="language-yaml">apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: traefik
+  name: tailscale-operator
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: &quot;0&quot;
+    argocd.argoproj.io/sync-wave: &quot;1&quot;
 spec:
   project: platform
   sources:
-    - repoURL: https://traefik.github.io/charts
-      chart: traefik
-      targetRevision: 42.1.3
+    - repoURL: https://pkgs.tailscale.com/helmcharts
+      chart: tailscale-operator
+      targetRevision: 1.104.2
       helm:
         valueFiles:
-          - $values/kubernetes/helm/values/traefik.yaml
+          - $values/kubernetes/helm/values/tailscale-operator.yaml
     - repoURL: https://github.com/natsuichigo/platform-lab.git
       targetRevision: develop
       ref: values
   destination:
     server: https://kubernetes.default.svc
-    namespace: traefik
+    namespace: tailscale
   syncPolicy:
     automated: { prune: true, selfHeal: true }
     syncOptions: [CreateNamespace=true]
@@ -149,50 +149,58 @@ everything the profile created, so the Git history is also a log of what the lab
       - run: kubectl wait deployment --all -A --for=condition=Available --timeout=5m
 </code></pre>
 <p>No kubeconfig is needed: the runner pod uses its own read-only ServiceAccount.</p>
-<h2 id="why-argo-cd-comes-before-traefik">Why Argo CD Comes Before Traefik</h2>
-<p>Argo CD's own UI is routed through Traefik, yet Argo CD is installed first, because
-it's what installs Traefik. That works because an Ingress is only a stored record of
-a route. The Argo CD chart creates an Ingress for <code>argocd.platform-lab.localhost</code>
-before any ingress controller exists. When Traefik arrives, it watches the API for
-Ingresses with its class and picks that one up. Until then, the UI is reached with a
-temporary port-forward to <code>argocd-server</code>. Once Traefik is up, that port-forward is
-never needed again: the cluster itself publishes Traefik on <code>127.0.0.1:80</code>. Declare what you want, and a controller acts
-on it whenever it's running: that's the pattern behind all of Kubernetes.</p>
-<h2 id="no-port-forward-the-cluster-publishes-traefik">No Port-Forward: the Cluster Publishes Traefik</h2>
-<p>The first version reached every UI through <code>kubectl port-forward</code> to Traefik, which had
-to be restarted after every reboot. Now the port is part of the cluster definition:</p>
-<pre><code class="language-yaml"># kubernetes/kind/platform-lab.yaml
-nodes:
-  - role: control-plane
-    extraPortMappings:
-      - containerPort: 30080      # Traefik's NodePort
-        hostPort: 80
-        listenAddress: 127.0.0.1  # loopback only: the routes are plain HTTP
+<h2 id="why-argo-cd-comes-before-its-own-front-door">Why Argo CD Comes Before Its Own Front Door</h2>
+<p>Argo CD's UI is reached over Tailscale, yet Argo CD is installed first, because it's
+what installs the Tailscale operator. Until the operator is running, the UI is reached
+with a temporary port-forward to <code>argocd-server</code>. Then one Ingress puts it on the
+tailnet, and the port-forward is never needed again. Declare what you want, and a
+controller acts on it whenever it's running: that's the pattern behind all of Kubernetes.</p>
+<h2 id="every-ui-on-the-tailnet">Every UI on the Tailnet</h2>
+<p>The first version reached every UI through <code>kubectl port-forward</code>, which had to be
+restarted after every reboot. The second used Traefik on <code>.localhost</code> names, published
+by kind on <code>127.0.0.1</code> only. That kept everything on the laptop, but also meant the UIs
+only worked on the laptop. Now each UI is one Ingress for the Tailscale operator:</p>
+<pre><code class="language-yaml"># kubernetes/ingress/tailnet.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: argocd-tailnet
+  namespace: argocd
+spec:
+  ingressClassName: tailscale
+  tls:
+    - hosts:
+        - argocd                # becomes argocd.&lt;tailnet&gt;.ts.net, with a real certificate
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: argocd-server
+                port:
+                  number: 80
 </code></pre>
-<pre><code class="language-yaml"># kubernetes/helm/values/traefik.yaml
-service:
-  spec:
-    type: NodePort
-ports:
-  web:
-    nodePort: 30080
-providers:
-  kubernetesIngress:
-    publishedService: { enabled: false }
-    ingressEndpoint: { ip: 127.0.0.1 }   # gives every Ingress an address (see Lessons)
-</code></pre>
-<p>Port mappings are fixed when kind creates the cluster, so <code>cluster-up.sh</code> warns if an
-existing cluster lacks the mapping. Rebuilding takes one command because everything else
-comes back from Git.</p>
+<p>The operator starts a proxy pod that joins the tailnet as <code>argocd</code>, gets a Let's
+Encrypt certificate and forwards to the Service. The cluster only makes outbound
+connections, so it works behind WSL's NAT, from my phone, and on any network. The
+operator's OAuth credentials are created from a local file by a script, never committed.</p>
+<p>Each profile brings its own Ingress as a second source in its Application. Profiles sync
+after the shared Ingress app, when their namespace doesn't exist yet, so keeping the
+Ingress with the profile means it only appears while the profile is on.</p>
 <h2 id="an-image-from-build-to-pod">An Image From Build to Pod</h2>
-<p>The lab registry was proven end to end with one image: pushed from WSL through Traefik,
-then started as a pod from the same name.</p>
+<p>The lab registry was proven end to end with one image: pushed from WSL, then started as
+a pod from the same name. That first test used the registry's old <code>.localhost</code> name,
+from before the move to Tailscale:</p>
 <pre><code class="language-bash">podman push registry.platform-lab.localhost/test/busybox:1.37
 kubectl run regtest -n playground --restart=Never \
   --image=registry.platform-lab.localhost/test/busybox:1.37 -- echo pulled-from-lab-registry
 # Successfully pulled image &quot;registry.platform-lab.localhost/test/busybox:1.37&quot; in 236ms
 </code></pre>
-<p>Execution Environments follow the same path. One script handles both sources: an image
+<p>Today the same push goes to <code>registry.&lt;tailnet&gt;.ts.net</code> over HTTPS through Tailscale,
+and pods still pull that name straight from the registry's ClusterIP. Execution
+Environments follow the same path. One script handles both sources: an image
 built locally with Podman, or a copy (with <code>skopeo</code>) of one the pipeline built on GitHub.</p>
 <pre><code class="language-bash">./scripts/lab-registry.sh push localhost/ee-base-core-2.18:dev ee/base-core-2.18:dev
 ./scripts/lab-registry.sh copy ghcr.io/&lt;owner&gt;/&lt;ee&gt;:&lt;tag&gt;
@@ -219,7 +227,7 @@ t http://argocd-server.argocd.svc     # BLOCKED   the platform is out of reach
 <code>--dry-run=server</code> label check confirms nothing running would break, before the namespace
 starts enforcing.</p>
 <div class="callout warn">
-<p><strong>Lab-only shortcuts are labelled as such.</strong> Metrics Server skips kubelet TLS verification because kind's kubelet certificates are self-signed. Argo CD serves plain HTTP behind Traefik. All UIs are reached through a kind port mapping bound to <code>127.0.0.1</code>, so nothing is exposed beyond the machine. Headlamp has no login and acts as a <code>cluster-admin</code> ServiceAccount, so it is locked to the laptop's browser by a Traefik IP allow-list and a NetworkPolicy.</p>
+<p><strong>Lab-only shortcuts are labelled as such.</strong> Metrics Server skips kubelet TLS verification because kind's kubelet certificates are self-signed. Argo CD serves plain HTTP inside the cluster; HTTPS ends at its Tailscale proxy. The UIs are reachable only over my tailnet, and the tailnet policy grants only my own user, so nothing is exposed to the LAN or the internet. Headlamp has no login and acts as a <code>cluster-admin</code> ServiceAccount, so it relies on that policy plus a NetworkPolicy that lets only the Tailscale proxy pods connect. The registry has no authentication yet for the same reason: only the cluster and my own devices can reach it.</p>
 </div>
 
 <h2 id="practising-for-ckad-and-cka">Practising for CKAD and CKA</h2>

@@ -93,7 +93,7 @@ CI runners, a container registry, Prometheus and Grafana, AWX, Backstage, and a 
 hypervisor for VM images) on one 8 GB laptop, with no cloud bill. It is also how I practise for the Kubernetes certifications: the cluster I
 study on is the platform itself.</p>
 <div class="callout">
-<p><strong>Status: in progress.</strong> The kind cluster and Argo CD are running and syncing from GitHub through a GitHub App, after a DNS search-domain clash that broke TLS to GitHub was found and fixed. The core platform (Traefik, Metrics Server, RBAC and the Headlamp cluster UI) deploys from Git, and every UI opens with no port-forward. In-cluster runners for this repo and the Packer pipeline are next, then hardening. See the <a href="./lessons.html">roadmap and problems log</a>.</p>
+<p><strong>Status: in progress.</strong> The kind cluster and Argo CD are running and syncing from GitHub through a GitHub App, after a DNS search-domain clash that broke TLS to GitHub was found and fixed. The core platform (Metrics Server, RBAC, the Headlamp cluster UI and the lab registry) deploys from Git. Every UI is private to my tailnet: the Tailscale operator gives each one its own name and HTTPS certificate, with no open ports. In-cluster runners for this repo and the Packer pipeline are next, then hardening. See the <a href="./lessons.html">roadmap and problems log</a>.</p>
 </div>
 
 <h2 id="principles">Principles</h2>
@@ -116,7 +116,7 @@ study on is the platform itself.</p>
 <div class="badge-row">
     <span class="badge badge-blue">Kubernetes (kind)</span>
     <span class="badge badge-green">Argo CD</span>
-    <span class="badge badge-amber">Traefik</span>
+    <span class="badge badge-amber">Tailscale</span>
     <span class="badge badge-blue">Actions Runner Controller</span>
     <span class="badge badge-green">Headlamp</span>
     <span class="badge badge-amber">zot</span>
@@ -152,13 +152,13 @@ study on is the platform itself.</p>
 <td>Sealed Secrets</td>
 </tr>
 <tr>
-<td>Ingress</td>
-<td>Traefik on <code>*.platform-lab.localhost</code>, published by kind on loopback</td>
-<td>cert-manager, Gateway API</td>
+<td>Access</td>
+<td>Tailscale operator: one tailnet name and HTTPS certificate per UI, reachable from my own devices only</td>
+<td>Gateway API</td>
 </tr>
 <tr>
 <td>Cluster UI</td>
-<td>Headlamp, no login, reachable only from the laptop</td>
+<td>Headlamp, no login, reachable only by my tailnet user</td>
 <td>—</td>
 </tr>
 <tr>
@@ -188,7 +188,7 @@ study on is the platform itself.</p>
 </tr>
 <tr>
 <td>Security</td>
-<td>RBAC, local-only access, secrets kept out of Git</td>
+<td>RBAC, tailnet-only access with no open ports, secrets kept out of Git</td>
 <td>Pod Security <code>restricted</code>, NetworkPolicy, SHA-pinned actions, Sealed Secrets</td>
 </tr>
 <tr>

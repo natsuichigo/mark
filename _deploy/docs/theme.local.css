@@ -111,6 +111,64 @@
   display: block;
 }
 
+/* Side columns may shrink (with "…") instead of running into the centre. */
+.hdr-page-nav {
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+}
+
+/* ── Page-nav row on tablets and phones ──────────────────────
+   Below 60em (where the sidebar becomes the ☰ menu) the row splits
+   in two: Projects · <project> · Home across the top, then
+   ◀ previous / next ▶ underneath, so nothing overlaps. */
+@media screen and (max-width: 59.984375em) {
+  .hdr-page-nav {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      "centre centre"
+      "prev   next";
+    row-gap: 0.35rem;
+    padding: 0.4rem 0.8rem 0.45rem;
+  }
+  .hdr-page-nav > :first-child { grid-area: prev; }
+  .hdr-page-nav > :last-child  { grid-area: next; }
+  .hdr-page-nav > .hdr-page-nav__centre {
+    grid-area: centre;
+    justify-self: stretch;
+    justify-content: center;
+    gap: 0.4rem;
+  }
+  .hdr-page-nav__centre .hdr-page-nav__link {
+    flex: 0 1 auto;
+    min-width: 0;
+    text-align: center;
+  }
+  .hdr-page-nav__link {
+    padding: 0.4rem 0.7rem;
+  }
+  .hdr-page-nav__prev,
+  .hdr-page-nav__next {
+    max-width: 100%;
+  }
+}
+
+/* Phones: three equal buttons, bigger tap targets. */
+@media screen and (max-width: 30em) {
+  .hdr-page-nav {
+    font-size: 0.8rem;
+  }
+  .hdr-page-nav > .hdr-page-nav__centre {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr) minmax(0, 0.8fr);
+  }
+  .hdr-page-nav__centre .hdr-page-nav__link {
+    padding: 0.55rem 0.3rem;
+  }
+  .hdr-page-nav__prev,
+  .hdr-page-nav__next {
+    padding: 0.45rem 0.3rem;
+  }
+}
+
 .md-footer {
   background: linear-gradient(135deg, rgba(30, 41, 59, 0.98), rgba(79, 70, 229, 0.9));
   background: linear-gradient(135deg, rgba(var(--brand-primary-rgb), 0.98), rgba(var(--brand-accent-rgb), 0.9));
