@@ -200,11 +200,21 @@
     sel.setAttribute('aria-label', 'Language');
     sel.setAttribute('translate', 'no');
     var current = storedLang() || (getCookie('googtrans').split('/')[2]) || '';
-    var opts = '<option value="">English</option>';
+    var TOP = ['vi', 'de', 'nl'];
+    var names = {};
     for (var li = 0; li < LANGS.length; li++) {
         var parts = LANGS[li].split(/:(.+)/);
-        opts += '<option value="' + parts[0] + '"' + (parts[0] === current ? ' selected' : '') + '>' +
-                esc(parts[1]) + '</option>';
+        names[parts[0]] = parts[1];
+    }
+    function opt(code, label) {
+        return '<option value="' + code + '"' + (code === current ? ' selected' : '') + '>' + esc(label) + '</option>';
+    }
+    var opts = opt('', 'English');
+    for (var ti = 0; ti < TOP.length; ti++) { opts += opt(TOP[ti], names[TOP[ti]]); }
+    opts += '<option disabled>──────────</option>';
+    for (var lj = 0; lj < LANGS.length; lj++) {
+        var code = LANGS[lj].split(':')[0];
+        if (TOP.indexOf(code) === -1) { opts += opt(code, names[code]); }
     }
     sel.innerHTML = opts;
     langWrap.appendChild(sel);
