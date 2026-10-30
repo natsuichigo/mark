@@ -220,6 +220,7 @@
     applyUI(current);
 
     if (current) {
+        setTransCookie(current);
         if (window.MutationObserver) {
             var translationObserver = new window.MutationObserver(function () {
                 var html = document.documentElement;
