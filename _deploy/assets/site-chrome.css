@@ -351,3 +351,15 @@
                 box-shadow: inset 0 -3px 0 var(--brand-highlight, #f59e0b);
     }
 }
+
+/* Language picker */
+.plat-nav__lang { margin-left: auto; display: flex; align-items: center; }
+.plat-nav__lang-select {
+    max-width: 10rem; padding: .3rem .5rem; border-radius: 6px;
+    font: inherit; font-size: .85rem; color: inherit;
+    background: transparent; border: 1px solid currentColor; cursor: pointer;
+}
+.plat-nav__lang-select option { color: #111; background: #fff; }
+/* Hide Google's injected banner and keep layout stable */
+body { top: 0 !important; }
+.skiptranslate > iframe.skiptranslate, iframe.goog-te-banner-frame { display: none !important; }
