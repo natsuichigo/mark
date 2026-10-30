@@ -168,9 +168,9 @@
             var base = '';
             for (var n = 0; n < NAV.length; n++) { if (NAV[n].id === id) { base = NAV[n].label; } }
             anchors[a].textContent = dict ? dict[id] : base;
+            anchors[a].setAttribute('lang', dict ? lang : 'en');
+            anchors[a].setAttribute('dir', dict && RTL[lang] ? 'rtl' : 'ltr');
         }
-        document.documentElement.setAttribute('lang', lang || 'en');
-        document.documentElement.setAttribute('dir', RTL[lang] ? 'rtl' : 'ltr');
     }
     function storedLang() {
         try { return localStorage.getItem('sc-lang') || ''; } catch (e) { return ''; }
@@ -220,6 +220,17 @@
     applyUI(current);
 
     if (current) {
+        if (window.MutationObserver) {
+            var translationObserver = new window.MutationObserver(function () {
+                var html = document.documentElement;
+                if (/\btranslated-(?:ltr|rtl)\b/.test(html.className)) {
+                    html.setAttribute('lang', current);
+                    html.setAttribute('dir', RTL[current] ? 'rtl' : 'ltr');
+                    translationObserver.disconnect();
+                }
+            });
+            translationObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+        }
         window.googleTranslateInit = function () {
             new window.google.translate.TranslateElement(
                 { pageLanguage: 'en', autoDisplay: false }, 'google_translate_element');
